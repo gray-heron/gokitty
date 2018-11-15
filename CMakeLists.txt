@@ -23,7 +23,7 @@ set(APP_NAME ${PROJECT_NAME})
 # ==============================================================================
 
 add_compile_options(-std=c++17 -Wall -Werror)
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "clang-6.0")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   add_compile_options(-fno-limit-debug-info)
 endif()
 
@@ -34,6 +34,7 @@ include_directories(${CMAKE_BINARY_DIR}/dependencies/include)
 # ==============================================================================
 # dependencies
 # ==============================================================================
+
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -47,6 +48,14 @@ ExternalProject_Add(spdlog-dependency
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/dependencies
 )
 
+ExternalProject_Add(sdl2-dependency
+  URL https://github.com/libSDL2pp/libSDL2pp/archive/0.16.0.tar.gz
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/dependencies -DSDL2PP_WITH_IMAGE=ON -DSDL2PP_WITH_TTF=ON -DSDL2PP_WITH_MIXER=OFF
+)
+
+find_package(Torch REQUIRED)
+link_directories(${CMAKE_BINARY_DIR}/dependencies/lib)
+
 # ==============================================================================
 # resources
 # ==============================================================================
@@ -58,17 +67,18 @@ cmrc_add_resource_library(resources res/default_configuration.xml)
 # ==============================================================================
 
 add_executable(${APP_NAME}
-  src/main.cpp
   src/log.cpp
   src/config.cpp
+  src/main.cpp
 )
 
 target_link_libraries(${APP_NAME}
-  ${Boost_LIBRARIES} pugixml resources
+  ${Boost_LIBRARIES} pugixml SDL2pp torch resources
 )
 
 add_dependencies(${APP_NAME} spdlog-dependency)
 add_dependencies(${APP_NAME} pugixml-dependency)
+add_dependencies(${APP_NAME} sdl2-dependency)
 
 # ==============================================================================
 # tests

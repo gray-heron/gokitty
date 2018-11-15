@@ -1,13 +1,6 @@
 <configuration>
-    <log_file type="string">
-        gokitty.log
-    </log_file>
-
-    <verbose type="bool">
-        false
-    </verbose>
-
-    <config_xml type="string">
-    </config_xml>
-
+    <log_file type="string">gokitty.log</log_file>
+    <verbose type="bool">false</verbose>
+    <config type="string"></config>
+    <track type="string"></track>
 </configuration>

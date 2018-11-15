@@ -6,9 +6,9 @@
 
 #include "log.h"
 
-#define ASSERT(x, ...)                                                         \
-    if (!(x))                                                                  \
-        throw AssertionFailedException(__FILE__, __LINE__, __VA_ARGS__);
+#define ASSERT(x, ...)                                                                   \
+    if (!(x))                                                                            \
+        throw AssertionFailedException(__FILE__, __LINE__, #__VA_ARGS__);
 
 class Exception : public std::exception
 {

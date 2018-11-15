@@ -2,15 +2,22 @@
 #pragma once
 
 #include <boost/any.hpp>
+#include <boost/variant.hpp>
 #include <exceptions.h>
 #include <map>
+#include <pugixml.hpp>
 #include <string>
 
 class Config
 {
   private:
-    Config() = default;
-    std::map<std::string, boost::any> params;
+    Config();
+    std::map<std::string, boost::any> params_;
+    void LoadXMLConfig(pugi::xml_document &doc);
+
+    boost::any ParseValue(const std::type_info &type_id, std::string value);
+
+    Log log_{"Configuration"};
 
   public:
     Config(Config const &) = delete;
@@ -22,12 +29,15 @@ class Config
         return instance;
     }
 
-    bool Load(std::string config);
+    void Load(std::string config_path);
+    void Load(int argc, char **argv);
+
+    void SetParameter(std::string name, boost::any val);
 
     template <typename T> T GetOption(std::string name)
     {
-        auto val = params.find(name);
-        ASSERT(val != params.end(), "No such option: " + name);
+        auto val = params_.find(name);
+        ASSERT(val != params_.end(), "No such option: " + name);
         ASSERT(val->second.type() == typeid(T),
                "Requested option " + name + " with type " + typeid(T).name() +
                    " but got " + val->second.type().name());
