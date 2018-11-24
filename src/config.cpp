@@ -56,18 +56,15 @@ void Config::Load(std::string config_path)
 
 void Config::Load(int argc, char **argv)
 {
-    bool clean = true;
-
     for (int arg_i = 1; arg_i < argc; arg_i++)
     {
         string current_argument(argv[arg_i]), current_name, current_value;
         std::map<std::string, boost::any>::iterator param_entry;
-        int cursor = NAME_PREFIX.length();
+        unsigned int cursor = NAME_PREFIX.length();
 
         if (NAME_PREFIX != "" && current_argument.find(NAME_PREFIX) != 0)
         {
             log_.Error() << "Wrong prefix on argument: " << current_argument << "!";
-            clean = false;
             continue;
         }
 
@@ -81,14 +78,12 @@ void Config::Load(int argc, char **argv)
         if (cursor == current_argument.length())
         {
             log_.Error() << "No separator on argument: " << current_argument << "!";
-            clean = false;
             continue;
         }
 
         if ((param_entry = params_.find(current_name)) == params_.end())
         {
             log_.Error() << "Argument not recognized: " << current_name << "!";
-            clean = false;
             continue;
         }
 

@@ -22,7 +22,7 @@ set(APP_NAME ${PROJECT_NAME})
 # compiler settings
 # ==============================================================================
 
-add_compile_options(-std=c++17 -Wall -Werror)
+add_compile_options(-std=c++11 -Wall -Werror)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   add_compile_options(-fno-limit-debug-info)
 endif()
@@ -54,6 +54,11 @@ ExternalProject_Add(sdl2-dependency
 )
 
 find_package(Torch REQUIRED)
+include_directories("/opt/libtorch/include/") #FIXME
+
+FIND_PACKAGE(SDL2 REQUIRED) #FIXME
+include_directories(${SDL2_INCLUDE_DIRS})
+
 link_directories(${CMAKE_BINARY_DIR}/dependencies/lib)
 
 # ==============================================================================
@@ -70,10 +75,22 @@ add_executable(${APP_NAME}
   src/log.cpp
   src/config.cpp
   src/main.cpp
+  src/model_element.cpp
+  src/visualisation.cpp
+  src/hinge_model.cpp
+
+  inc/visualisation.h
+  inc/model_element.h
+  inc/config.h
+  inc/exceptions.h
+  inc/log.h
+  inc/hinge_model.h
 )
 
+set_property(TARGET ${APP_NAME} PROPERTY CXX_STANDARD 11)
+
 target_link_libraries(${APP_NAME}
-  ${Boost_LIBRARIES} pugixml SDL2pp torch resources
+  ${Boost_LIBRARIES} pugixml SDL2pp ${TORCH_LIBRARIES} resources
 )
 
 add_dependencies(${APP_NAME} spdlog-dependency)

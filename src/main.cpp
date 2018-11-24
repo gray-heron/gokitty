@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include <torch/torch.h>
+
 #include "config.h"
 #include "log.h"
 
