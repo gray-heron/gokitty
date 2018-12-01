@@ -1,4 +1,4 @@
 <configuration>
     <verbose>true</verbose>
-    <track type="string">tracks/emero.xml</track>
+    <track type="string">data/tracks/alpine.xml</track>
 </configuration>

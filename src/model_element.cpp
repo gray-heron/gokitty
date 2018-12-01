@@ -13,7 +13,7 @@ void ModelElement::Step()
 
 void ModelElement::Visualise(std::vector<Visualisation::Object> &objects)
 {
-    Visualise(objects);
+    VisualiseThis(objects);
     for (auto child : children_)
     {
         child->Visualise(objects);

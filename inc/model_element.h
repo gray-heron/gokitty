@@ -15,9 +15,9 @@ class ModelElement
 
   protected:
     void AddChild(ModelElement *child);
-    void Visualise(std::vector<Visualisation::Object> &objects);
     void Step();
 
   public:
     virtual ~ModelElement() = default;
+    void Visualise(std::vector<Visualisation::Object> &objects);
 };

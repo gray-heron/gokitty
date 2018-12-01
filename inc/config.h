@@ -2,7 +2,6 @@
 #pragma once
 
 #include <boost/any.hpp>
-#include <boost/variant.hpp>
 #include <exceptions.h>
 #include <map>
 #include <pugixml.hpp>
@@ -14,8 +13,6 @@ class Config
     Config();
     std::map<std::string, boost::any> params_;
     void LoadXMLConfig(pugi::xml_document &doc);
-
-    boost::any ParseValue(const std::type_info &type_id, std::string value);
 
     Log log_{"Configuration"};
 

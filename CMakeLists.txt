@@ -12,7 +12,6 @@ enable_testing()
 # ==============================================================================
 option(USE_LOCAL_GTEST "uses local gtest" OFF)
 option(USE_LOCAL_SPDLOG "uses local spdlog" OFF)
-
 # ==============================================================================
 # names
 # ==============================================================================
@@ -21,8 +20,8 @@ set(APP_NAME ${PROJECT_NAME})
 # ==============================================================================
 # compiler settings
 # ==============================================================================
-
-add_compile_options(-std=c++11 -Wall -Werror)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   add_compile_options(-fno-limit-debug-info)
 endif()
@@ -36,6 +35,8 @@ include_directories(${CMAKE_BINARY_DIR}/dependencies/include)
 # ==============================================================================
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
 
 ExternalProject_Add(pugixml-dependency
@@ -50,13 +51,10 @@ ExternalProject_Add(spdlog-dependency
 
 ExternalProject_Add(sdl2-dependency
   URL https://github.com/libSDL2pp/libSDL2pp/archive/0.16.0.tar.gz
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/dependencies -DSDL2PP_WITH_IMAGE=ON -DSDL2PP_WITH_TTF=ON -DSDL2PP_WITH_MIXER=OFF
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/dependencies -DSDL2PP_WITH_MIXER=OFF -DSDL2PP_WITH_IMAGE=OFF -DSDL2PP_STATIC=ON
 )
 
-find_package(Torch REQUIRED)
-include_directories("/opt/libtorch/include/") #FIXME
-
-FIND_PACKAGE(SDL2 REQUIRED) #FIXME
+FIND_PACKAGE(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
 link_directories(${CMAKE_BINARY_DIR}/dependencies/lib)
@@ -78,6 +76,8 @@ add_executable(${APP_NAME}
   src/model_element.cpp
   src/visualisation.cpp
   src/hinge_model.cpp
+  src/util.cpp
+  src/data_reader.cpp
 
   inc/visualisation.h
   inc/model_element.h
@@ -85,12 +85,14 @@ add_executable(${APP_NAME}
   inc/exceptions.h
   inc/log.h
   inc/hinge_model.h
+  inc/util.h
+  inc/data_reader.h
 )
 
 set_property(TARGET ${APP_NAME} PROPERTY CXX_STANDARD 11)
 
 target_link_libraries(${APP_NAME}
-  ${Boost_LIBRARIES} pugixml SDL2pp ${TORCH_LIBRARIES} resources
+  ${Boost_LIBRARIES} pugixml SDL2pp ${SDL2_LIBRARIES} resources
 )
 
 add_dependencies(${APP_NAME} spdlog-dependency)

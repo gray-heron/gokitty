@@ -3,6 +3,7 @@
 #include <cmrc/cmrc.hpp>
 
 #include "config.h"
+#include "util.h"
 
 CMRC_DECLARE(resources);
 
@@ -11,38 +12,14 @@ using std::string;
 const string NAME_PREFIX = "--";
 const char NAME_VALUE_SEPARATOR = '=';
 
-boost::any Config::ParseValue(const std::type_info &type_id, std::string value)
-{
-    if (type_id == typeid(string))
-        return value;
-    if (type_id == typeid(int))
-        return std::stoi(value);
-    if (type_id == typeid(float))
-        return std::stof(value);
-    if (type_id == typeid(double))
-        return std::stod(value);
-    if (type_id == typeid(bool))
-    {
-        if (value == "true")
-            return true;
-        else if (value == "false")
-            return false;
-
-        return static_cast<bool>(std::stoi(value));
-    }
-
-    throw Exception((string) "Unrecognized type: " + type_id.name());
-}
-
 Config::Config()
 {
-    pugi::xml_document doc;
-    auto fs = cmrc::resources::get_filesystem();
-    auto config_file = fs.open("res/default_configuration.xml");
-    if (!doc.load_buffer(config_file.begin(), config_file.size()))
-        throw Exception("Couldn't parse configuration");
-
-    LoadXMLConfig(doc);
+    // pugi::xml_document doc;
+    // auto fs = cmrc::resources::get_filesystem();
+    // auto config_file = fs.open("res/default_configuration.xml");
+    // if (!doc.load_buffer(config_file.begin(), config_file.size()))
+    //    throw Exception("Couldn't parse configuration");
+    // LoadXMLConfig(doc);
 }
 
 void Config::Load(std::string config_path)

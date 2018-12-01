@@ -1,18 +1,8 @@
 #include "hinge_model.h"
 #include "exceptions.h"
+#include "util.h"
 
 using std::get;
-
-torch::Tensor TFV(float x, float y)
-{
-    auto ret = torch::ones({2, 1});
-    ret[0][0] = x;
-    ret[1][0] = x;
-
-    return ret;
-}
-
-float S(torch::Tensor t) { return t._local_scalar().toDouble(); }
 
 HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_side)
     : width_(width), height_(height), collision_zone_side_(collision_zone_side)
@@ -22,8 +12,9 @@ HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_sid
         collision_zones_.emplace_back();
         for (uint32_t y = 0; y < height; ++y)
         {
-            auto collision_zone = new HingeCollisionZone(this, TFV(x * width, y * height),
-                                                         collision_zone_side);
+            auto collision_zone = new HingeCollisionZone(
+                this, TFV(x * collision_zone_side, y * collision_zone_side),
+                collision_zone_side);
             (collision_zones_.end() - 1)->push_back(collision_zone);
             AddChild(collision_zone);
         }
@@ -83,7 +74,12 @@ HingeModel::Hinge::Hinge(HingeModel *model, torch::Tensor position)
 
 void HingeModel::Hinge::Simulate() {}
 
-HingeModel::BandSegement::BandSegement(HingeModel *model, torch::Tensor position) {}
+HingeModel::BandSegement::BandSegement(HingeModel *model, torch::Tensor position)
+{
+    position_ = position;
+    model->AddBandSegment(this);
+}
+
 void HingeModel::BandSegement::Simulate() {}
 
 void HingeModel::Segment::VisualiseThis(std::vector<Visualisation::Object> &objects)

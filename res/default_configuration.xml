@@ -2,5 +2,14 @@
     <log_file type="string">gokitty.log</log_file>
     <verbose type="bool">false</verbose>
     <config type="string"></config>
-    <track type="string"></track>
+
+    <resx type="int">1600</resx>
+    <resy type="int">900</resy>
+
+    <angle_factor type="float">0.1965</angle_factor>
+    <forward_factor type="float">0.4</forward_factor>
+    <bound_factor type="float">0.4</bound_factor>
+    <band_separation type="float">50.0f</band_separation>
+
+    <track type="string">data/tracks/alpine.xml</track>
 </configuration>

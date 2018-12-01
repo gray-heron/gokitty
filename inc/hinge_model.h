@@ -1,6 +1,7 @@
 #pragma once
 
 #include "model_element.h"
+#include <eigen3/Eigen/Core>
 #include <set>
 
 class HingeModel : public ModelElement
@@ -14,7 +15,7 @@ class HingeModel : public ModelElement
         void Simulate() override;
         void VisualiseThis(std::vector<Visualisation::Object> &objects) override;
 
-        torch::Tensor position_;
+        Eigen::Vector2f position_;
         float collision_zone_side_;
 
         std::set<Segment *> segments_;
@@ -46,7 +47,6 @@ class HingeModel : public ModelElement
 
       public:
         Hinge(HingeModel *model, torch::Tensor position);
-        void LinkForward(Hinge *next);
     };
 
     class BandSegement : public Segment
@@ -56,7 +56,6 @@ class HingeModel : public ModelElement
 
       public:
         BandSegement(HingeModel *model, torch::Tensor position);
-        void LinkForward(BandSegement *next);
     };
 
   private:
