@@ -12,19 +12,16 @@ Visualisation::Visualisation()
       window_("gokitty", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
               Config::inst().GetOption<int>("resx"),
               Config::inst().GetOption<int>("resy"), 0),
-      renderer_(window_, -1, SDL_RENDERER_ACCELERATED), camera_pos_(TFV(0.0f, 0.0f)),
-      zoom_(TFS(1.0f)), exit_(false)
+      renderer_(window_, -1, SDL_RENDERER_ACCELERATED),
+      windows_offset_(adept::Vector({Config::inst().GetOption<int>("resx") / 2,
+                                     Config::inst().GetOption<int>("resy") / 2})),
+      camera_pos_(-windows_offset_), zoom_(1.0f), exit_(false)
 {
     renderer_.SetLogicalSize(Config::inst().GetOption<int>("resx"),
                              Config::inst().GetOption<int>("resy"));
 }
 
-Point Visualisation::TensorToPoint(torch::Tensor t)
-{
-    window_.GetTitle();
-    window_.GetPosition();
-    return Point(S(t[0][0]), S(t[1][0]));
-}
+Point Visualisation::TensorToPoint(adept::Vector t) { return Point(t[0], t[1]); }
 
 void Visualisation::Tick(const std::vector<Object> &objects)
 {
@@ -34,8 +31,9 @@ void Visualisation::Tick(const std::vector<Object> &objects)
     {
         renderer_.SetDrawColor(get<1>(obj));
 
-        renderer_.DrawLine(TensorToPoint(get<0>(obj).first + camera_pos_),
-                           TensorToPoint(get<0>(obj).second + camera_pos_));
+        renderer_.DrawLine(
+            TensorToPoint((get<0>(obj).first + camera_pos_) * zoom_ + windows_offset_),
+            TensorToPoint((get<0>(obj).second + camera_pos_) * zoom_ + windows_offset_));
     }
 
     SDL_Event event;
@@ -49,7 +47,7 @@ void Visualisation::Tick(const std::vector<Object> &objects)
         }
     }
 
-    SDL_Delay(20);
+    SDL_Delay(16);
 
     renderer_.Present();
 }
@@ -59,16 +57,22 @@ void Visualisation::HandleKeyDown(SDL_KeyboardEvent key)
     switch (key.keysym.sym)
     {
     case SDLK_UP:
-        camera_pos_ += TFV(0.0f, -20.0f) * zoom_;
+        camera_pos_ += adept::Vector({0.0f, 30.0f}) / zoom_;
         break;
     case SDLK_DOWN:
-        camera_pos_ += TFV(0.0f, 20.0f) * zoom_;
+        camera_pos_ += adept::Vector({0.0f, -30.0f}) / zoom_;
         break;
     case SDLK_LEFT:
-        camera_pos_ += TFV(-20.0f, 0.0f) * zoom_;
+        camera_pos_ += adept::Vector({30.0f, 0.0f}) / zoom_;
         break;
     case SDLK_RIGHT:
-        camera_pos_ += TFV(20.0f, 0.0f) * zoom_;
+        camera_pos_ += adept::Vector({-30.0f, 0.0f}) / zoom_;
+        break;
+    case SDLK_KP_PLUS:
+        zoom_ *= 2.0f;
+        break;
+    case SDLK_KP_MINUS:
+        zoom_ *= 0.5f;
         break;
     case SDLK_ESCAPE:
         exit_ = true;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SDL2pp/SDL2pp.hh>
-#include <torch/torch.h>
+#include <adept_arrays.h>
 #include <tuple>
 
 #include "log.h"

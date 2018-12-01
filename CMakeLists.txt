@@ -54,6 +54,13 @@ ExternalProject_Add(sdl2-dependency
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/dependencies -DSDL2PP_WITH_MIXER=OFF -DSDL2PP_WITH_IMAGE=OFF -DSDL2PP_STATIC=ON
 )
 
+ExternalProject_Add(adept-dependency
+  URL http://www.met.reading.ac.uk/clouds/adept/adept-2.0.5.tar.gz
+  CONFIGURE_COMMAND cd ../adept-dependency/ && ./configure --prefix=${CMAKE_BINARY_DIR}/dependencies
+  BUILD_COMMAND make -C ../adept-dependency
+  INSTALL_COMMAND make -C ../adept-dependency install
+  )
+
 FIND_PACKAGE(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
@@ -92,12 +99,13 @@ add_executable(${APP_NAME}
 set_property(TARGET ${APP_NAME} PROPERTY CXX_STANDARD 11)
 
 target_link_libraries(${APP_NAME}
-  ${Boost_LIBRARIES} pugixml SDL2pp ${SDL2_LIBRARIES} resources
+  ${Boost_LIBRARIES} pugixml SDL2pp ${SDL2_LIBRARIES} adept resources
 )
 
 add_dependencies(${APP_NAME} spdlog-dependency)
 add_dependencies(${APP_NAME} pugixml-dependency)
 add_dependencies(${APP_NAME} sdl2-dependency)
+add_dependencies(${APP_NAME} adept-dependency)
 
 # ==============================================================================
 # tests

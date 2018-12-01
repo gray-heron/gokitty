@@ -14,12 +14,12 @@ const char NAME_VALUE_SEPARATOR = '=';
 
 Config::Config()
 {
-    // pugi::xml_document doc;
-    // auto fs = cmrc::resources::get_filesystem();
-    // auto config_file = fs.open("res/default_configuration.xml");
-    // if (!doc.load_buffer(config_file.begin(), config_file.size()))
-    //    throw Exception("Couldn't parse configuration");
-    // LoadXMLConfig(doc);
+    pugi::xml_document doc;
+    auto fs = cmrc::resources::get_filesystem();
+    auto config_file = fs.open("res/default_configuration.xml");
+    if (!doc.load_buffer(config_file.begin(), config_file.size()))
+        throw Exception("Couldn't parse configuration");
+    LoadXMLConfig(doc);
 }
 
 void Config::Load(std::string config_path)

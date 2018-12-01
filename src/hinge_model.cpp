@@ -13,7 +13,7 @@ HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_sid
         for (uint32_t y = 0; y < height; ++y)
         {
             auto collision_zone = new HingeCollisionZone(
-                this, TFV(x * collision_zone_side, y * collision_zone_side),
+                this, adept::Vector({x * collision_zone_side, y * collision_zone_side}),
                 collision_zone_side);
             (collision_zones_.end() - 1)->push_back(collision_zone);
             AddChild(collision_zone);
@@ -21,15 +21,15 @@ HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_sid
     }
 }
 
-std::pair<uint32_t, uint32_t> HingeModel::CoordinatesToCollisionZone(torch::Tensor pos)
+std::pair<uint32_t, uint32_t> HingeModel::CoordinatesToCollisionZone(adept::Vector pos)
 {
     std::pair<uint32_t, uint32_t> ret;
 
-    ASSERT(S(pos[0][0]) < collision_zone_side_ * float(width_));
-    ASSERT(S(pos[1][0]) < collision_zone_side_ * float(height_));
+    ASSERT(pos[0] < collision_zone_side_ * float(width_));
+    ASSERT(pos[1] < collision_zone_side_ * float(height_));
 
-    ret.first = S(pos[0][0]) / collision_zone_side_;
-    ret.second = S(pos[1][0]) / collision_zone_side_;
+    ret.first = pos[0] / collision_zone_side_;
+    ret.second = pos[1] / collision_zone_side_;
 
     return ret;
 }
@@ -42,7 +42,7 @@ void HingeModel::Simulate() {}
 void HingeModel::VisualiseThis(std::vector<Visualisation::Object> &objects) {}
 
 HingeModel::HingeCollisionZone::HingeCollisionZone(HingeModel *model,
-                                                   torch::Tensor position, float side)
+                                                   adept::Vector position, float side)
     : position_(position), collision_zone_side_(side)
 {
 }
@@ -51,30 +51,30 @@ void HingeModel::HingeCollisionZone::Simulate() {}
 void HingeModel::HingeCollisionZone::VisualiseThis(
     std::vector<Visualisation::Object> &objects)
 {
-    objects.push_back(
-        Visualisation::Object({position_, position_ + TFV(collision_zone_side_, 0)},
-                              SDL2pp::Color(32, 32, 32)));
-    objects.push_back(
-        Visualisation::Object({position_, position_ + TFV(0, collision_zone_side_)},
-                              SDL2pp::Color(32, 32, 32)));
     objects.push_back(Visualisation::Object(
-        {position_ + TFV(collision_zone_side_, collision_zone_side_),
-         position_ + TFV(collision_zone_side_, 0)},
+        {position_, position_ + adept::Vector({collision_zone_side_, 0.0f})},
         SDL2pp::Color(32, 32, 32)));
     objects.push_back(Visualisation::Object(
-        {position_ + TFV(collision_zone_side_, collision_zone_side_),
-         position_ + TFV(0, collision_zone_side_)},
+        {position_, position_ + adept::Vector({0.0f, collision_zone_side_})},
         SDL2pp::Color(32, 32, 32)));
+    // objects.push_back(Visualisation::Object(
+    //    {position_ + adept::Vector(collision_zone_side_, collision_zone_side_),
+    //     position_ + adept::Vector(collision_zone_side_, 0)},
+    //    SDL2pp::Color(32, 32, 32)));
+    // objects.push_back(Visualisation::Object(
+    //    {position_ + adept::Vector(collision_zone_side_, collision_zone_side_),
+    //     position_ + adept::Vector(0, collision_zone_side_)},
+    //    SDL2pp::Color(32, 32, 32)));
 }
 
-HingeModel::Hinge::Hinge(HingeModel *model, torch::Tensor position)
+HingeModel::Hinge::Hinge(HingeModel *model, adept::Vector position)
 {
     model->AddHinge(this);
 }
 
 void HingeModel::Hinge::Simulate() {}
 
-HingeModel::BandSegement::BandSegement(HingeModel *model, torch::Tensor position)
+HingeModel::BandSegement::BandSegement(HingeModel *model, adept::Vector position)
 {
     position_ = position;
     model->AddBandSegment(this);

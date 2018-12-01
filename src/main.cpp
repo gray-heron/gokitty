@@ -7,13 +7,13 @@
 #include "visualisation.h"
 
 using std::string;
+adept::Stack stack; // ugly adept
 
 int main(int argc, char **argv)
 {
     Log log("main");
     log.Info() << "gokitty demo application";
 
-    Config::inst().Load("res/default_configuration.xml");
     Config::inst().Load(argc, argv);
 
     auto config_path = Config::inst().GetOption<std::string>("config");
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
     //====================
 
-    HingeModel model(20, 20, 50.0f);
+    HingeModel model(40, 40, 25.0f);
     Visualisation vis;
     DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
 

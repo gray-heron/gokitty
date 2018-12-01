@@ -1,7 +1,7 @@
 #pragma once
 
 #include "model_element.h"
-#include <eigen3/Eigen/Core>
+#include <adept_arrays.h>
 #include <set>
 
 class HingeModel : public ModelElement
@@ -15,13 +15,13 @@ class HingeModel : public ModelElement
         void Simulate() override;
         void VisualiseThis(std::vector<Visualisation::Object> &objects) override;
 
-        Eigen::Vector2f position_;
+        adept::Vector position_;
         float collision_zone_side_;
 
         std::set<Segment *> segments_;
 
       public:
-        HingeCollisionZone(HingeModel *model, torch::Tensor position_, float side);
+        HingeCollisionZone(HingeModel *model, adept::Vector position_, float side);
     };
 
     class Segment : public ModelElement
@@ -33,7 +33,7 @@ class HingeModel : public ModelElement
       protected:
         Segment *next_;
         Segment *previous_;
-        torch::Tensor position_;
+        adept::Vector position_;
 
       public:
         virtual ~Segment() = default;
@@ -46,7 +46,7 @@ class HingeModel : public ModelElement
         void Simulate() override;
 
       public:
-        Hinge(HingeModel *model, torch::Tensor position);
+        Hinge(HingeModel *model, adept::Vector position);
     };
 
     class BandSegement : public Segment
@@ -55,12 +55,12 @@ class HingeModel : public ModelElement
         void Simulate() override;
 
       public:
-        BandSegement(HingeModel *model, torch::Tensor position);
+        BandSegement(HingeModel *model, adept::Vector position);
     };
 
   private:
     std::vector<std::vector<HingeCollisionZone *>> collision_zones_;
-    std::pair<uint32_t, uint32_t> CoordinatesToCollisionZone(torch::Tensor pos);
+    std::pair<uint32_t, uint32_t> CoordinatesToCollisionZone(adept::Vector pos);
 
     uint32_t width_;
     uint32_t height_;

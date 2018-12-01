@@ -52,9 +52,9 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
                 y + std::sin(heading - M_PI / 2.0f) * /*waypoint.r * */ bound_factor;
 
             auto left_band =
-                new HingeModel::BandSegement(&model, TFV(lx + 500, ly + 500));
+                new HingeModel::BandSegement(&model, adept::Vector({lx + 500, ly + 500}));
             auto right_band =
-                new HingeModel::BandSegement(&model, TFV(rx + 500, ry + 500));
+                new HingeModel::BandSegement(&model, adept::Vector({rx + 500, ry + 500}));
 
             if (!first_left_band && !first_right_band)
             {
