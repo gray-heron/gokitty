@@ -19,7 +19,7 @@ class Exception : public std::exception
     const char *what() const throw() { return msg_.c_str(); };
 
     virtual ~Exception() throw(){};
-    Exception(std::string what) : msg_(what) {}
+    Exception(std::string what) : msg_(what) { Log("Exception").Error() << msg_; }
 };
 
 class AssertionFailedException : Exception

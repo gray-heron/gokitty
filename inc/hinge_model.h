@@ -22,6 +22,7 @@ class HingeModel : public ModelElement
 
       public:
         HingeCollisionZone(HingeModel *model, adept::Vector position_, float side);
+        void RegisterSegment(HingeModel::Segment *segment_);
     };
 
     class Segment : public ModelElement
@@ -29,11 +30,16 @@ class HingeModel : public ModelElement
         void LinkBackward(Segment *previous);
         void Simulate() = 0;
         void VisualiseThis(std::vector<Visualisation::Object> &objects);
+        virtual adept::Vector GetPosition() = 0;
 
       protected:
         Segment *next_;
         Segment *previous_;
-        adept::Vector position_;
+
+        HingeModel *model_;
+        SDL2pp::Color vis_color_;
+
+        Segment(HingeModel *model, SDL2pp::Color vis_color);
 
       public:
         virtual ~Segment() = default;
@@ -44,18 +50,22 @@ class HingeModel : public ModelElement
     {
       private:
         void Simulate() override;
+        adept::aVector position_;
 
       public:
         Hinge(HingeModel *model, adept::Vector position);
+        adept::Vector GetPosition() override;
     };
 
     class BandSegement : public Segment
     {
       private:
         void Simulate() override;
+        adept::Vector position_;
 
       public:
         BandSegement(HingeModel *model, adept::Vector position);
+        adept::Vector GetPosition() override;
     };
 
   private:
@@ -66,7 +76,9 @@ class HingeModel : public ModelElement
     uint32_t height_;
     float collision_zone_side_;
 
-    void Simulate();
+    Hinge *first_hinge_;
+
+    void Simulate() override;
     void VisualiseThis(std::vector<Visualisation::Object> &objects) override;
 
     void AddHinge(Hinge *h);

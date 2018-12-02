@@ -30,6 +30,7 @@ class Config
     void Load(int argc, char **argv);
 
     void SetParameter(std::string name, boost::any val);
+    void DumpSettings();
 
     template <typename T> T GetOption(std::string name)
     {

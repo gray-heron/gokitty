@@ -103,3 +103,29 @@ void Config::LoadXMLConfig(pugi::xml_document &doc)
 }
 
 void Config::SetParameter(std::string name, boost::any val) { params_[name] = val; }
+
+void Config::DumpSettings()
+{
+    for (const auto &param : params_)
+    {
+        string value;
+        auto &type_id = param.second.type();
+        if (type_id == typeid(string))
+            value = boost::any_cast<string>(param.second);
+        if (type_id == typeid(int))
+            value = std::to_string(boost::any_cast<int>(param.second));
+        if (type_id == typeid(float))
+            value = std::to_string(boost::any_cast<float>(param.second));
+        if (type_id == typeid(double))
+            value = std::to_string(boost::any_cast<double>(param.second));
+        if (type_id == typeid(bool))
+        {
+            if (boost::any_cast<bool>(param.second))
+                value = "true";
+            else
+                value = "false";
+        }
+
+        log_.Info() << "Param \"" << param.first << "\" = " << value;
+    }
+}

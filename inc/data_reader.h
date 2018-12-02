@@ -2,6 +2,7 @@
 #pragma once
 
 #include "hinge_model.h"
+#include "log.h"
 
 class DataReader
 {

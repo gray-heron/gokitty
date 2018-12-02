@@ -7,12 +7,12 @@
 #include "visualisation.h"
 
 using std::string;
-adept::Stack stack; // ugly adept
 
 int main(int argc, char **argv)
 {
     Log log("main");
     log.Info() << "gokitty demo application";
+    adept::Stack main_stack;
 
     Config::inst().Load(argc, argv);
 
@@ -27,6 +27,8 @@ int main(int argc, char **argv)
         Config::inst().GetOption<bool>("verbose"));
     LoggingSingleton::inst().AddLogFile(
         Config::inst().GetOption<std::string>("log_file"));
+
+    Config::inst().DumpSettings();
 
     //====================
 
