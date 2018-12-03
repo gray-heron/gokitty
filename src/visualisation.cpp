@@ -47,8 +47,6 @@ void Visualisation::Tick(const std::vector<Object> &objects)
         }
     }
 
-    SDL_Delay(16);
-
     renderer_.Present();
 }
 

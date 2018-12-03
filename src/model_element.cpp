@@ -2,12 +2,13 @@
 
 void ModelElement::AddChild(ModelElement *child) { children_.push_back(child); }
 
-void ModelElement::Step()
+void ModelElement::ComputeScore(adept::adouble &score)
 {
-    Simulate();
+    ComputeScoreThis(score);
+
     for (auto child : children_)
     {
-        child->Step();
+        child->ComputeScore(score);
     }
 }
 
@@ -17,5 +18,14 @@ void ModelElement::Visualise(std::vector<Visualisation::Object> &objects)
     for (auto child : children_)
     {
         child->Visualise(objects);
+    }
+}
+
+void ModelElement::ApplyGradient()
+{
+    ApplyGradientThis();
+    for (auto child : children_)
+    {
+        child->ApplyGradient();
     }
 }

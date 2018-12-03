@@ -8,8 +8,10 @@
 
     <angle_factor type="float">0.1965</angle_factor>
     <forward_factor type="float">0.4</forward_factor>
-    <bound_factor type="float">0.4</bound_factor>
-    <band_separation type="float">6.0f</band_separation>
+    <bound_factor type="float">10.4</bound_factor>
+    <band_separation type="float">20.0f</band_separation>
+
+    <alpha type="float">0.3</alpha>
 
     <track type="string"></track>
 </configuration>

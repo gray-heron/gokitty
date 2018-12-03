@@ -1,4 +1,5 @@
 #include "hinge_model.h"
+#include "config.h"
 #include "exceptions.h"
 #include "util.h"
 
@@ -6,7 +7,7 @@ using std::get;
 
 HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_side)
     : width_(width), height_(height), collision_zone_side_(collision_zone_side),
-      first_hinge_(nullptr)
+      alpha_(Config::inst().GetOption<float>("alpha")), first_hinge_(nullptr)
 {
     for (uint32_t x = 0; x < width; ++x)
     {
@@ -24,6 +25,7 @@ HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_sid
 
 std::pair<uint32_t, uint32_t> HingeModel::CoordinatesToCollisionZone(adept::Vector pos)
 {
+
     std::pair<uint32_t, uint32_t> ret;
 
     ASSERT(pos[0] < collision_zone_side_ * float(width_));
@@ -45,8 +47,26 @@ void HingeModel::AddHinge(Hinge *h)
 
 void HingeModel::AddBandSegment(BandSegement *bs) { AddChild(bs); }
 
-void HingeModel::Simulate() {}
-void HingeModel::VisualiseThis(std::vector<Visualisation::Object> &objects) {}
+void HingeModel::ComputeScoreThis(adept::adouble &score) const {}
+
+void HingeModel::VisualiseThis(std::vector<Visualisation::Object> &objects) const {}
+
+void HingeModel::ApplyGradientThis() {}
+
+double HingeModel::Optimize(adept::Stack &stack)
+{
+    stack.new_recording();
+    adept::adouble score = 0.0;
+    ComputeScore(score);
+    score.set_gradient(1.0);
+    stack.reverse();
+    ApplyGradient();
+
+    log_.Info() << "Optimization step done, score = " << score;
+    return score.value();
+}
+
+// ================ COLLISION_ZONE ================
 
 HingeModel::HingeCollisionZone::HingeCollisionZone(HingeModel *model,
                                                    adept::Vector position, float side)
@@ -54,9 +74,10 @@ HingeModel::HingeCollisionZone::HingeCollisionZone(HingeModel *model,
 {
 }
 
-void HingeModel::HingeCollisionZone::Simulate() {}
+void HingeModel::HingeCollisionZone::ComputeScoreThis(adept::adouble &score) const {}
+
 void HingeModel::HingeCollisionZone::VisualiseThis(
-    std::vector<Visualisation::Object> &objects)
+    std::vector<Visualisation::Object> &objects) const
 {
     objects.push_back(Visualisation::Object(
         {position_, position_ + adept::Vector({collision_zone_side_, 0.0f})},
@@ -74,15 +95,66 @@ void HingeModel::HingeCollisionZone::VisualiseThis(
     //    SDL2pp::Color(32, 32, 32)));
 }
 
+void HingeModel::HingeCollisionZone::ApplyGradientThis() {}
+
+bool HingeModel::HingeCollisionZone::Collides(Segment *seg) const
+{
+    for (const auto &s : segments_)
+    {
+        if (HingeModel::Segment::Intersects(s, seg))
+            return true;
+    }
+
+    return false;
+}
+
+void HingeModel::HingeCollisionZone::RegisterSegment(HingeModel::Segment *segment)
+{
+    segments_.insert(segment);
+}
+
+// ================ HINGE ================
+
 HingeModel::Hinge::Hinge(HingeModel *model, adept::Vector position)
     : HingeModel::Segment(model, SDL2pp::Color(0, 255, 0)), position_(position)
 {
     model->AddHinge(this);
 }
 
-void HingeModel::Hinge::Simulate() {}
+void HingeModel::Hinge::ComputeScoreThis(adept::adouble &score) const
+{
+    auto position_diff = (static_cast<Hinge *>(next_)->position_ - position_);
+    score += adept::sqrt(adept::sum(position_diff * position_diff));
+}
 
-adept::Vector HingeModel::Hinge::GetPosition() { return position_.inactive_link(); }
+adept::Vector HingeModel::Hinge::GetPosition() const
+{
+    return adept::aVector(position_).inactive_link();
+}
+
+void HingeModel::Hinge::ApplyGradientThis()
+{
+    adept::Vector new_position =
+        position_.inactive_link() - position_.get_gradient() * model_->alpha_;
+
+    auto from_collsion_zone = model_->CoordinatesToCollisionZone(GetPosition());
+    auto to_collsion_zone = model_->CoordinatesToCollisionZone(GetPosition());
+    for (int czx = from_collsion_zone.first; czx < to_collsion_zone.first + 1; czx++)
+    {
+        for (int czy = from_collsion_zone.second; czy < to_collsion_zone.second + 1;
+             czy++)
+        {
+            if (model_->collision_zones_[czx][czy]->Collides(this))
+            {
+                return;
+            }
+        }
+    }
+
+    position_ = new_position;
+}
+
+// ================ BAND_SEGMENT ================
 
 HingeModel::BandSegement::BandSegement(HingeModel *model, adept::Vector position)
     : HingeModel::Segment(model, SDL2pp::Color(255, 0, 0)), position_(position)
@@ -90,19 +162,20 @@ HingeModel::BandSegement::BandSegement(HingeModel *model, adept::Vector position
     model->AddBandSegment(this);
 }
 
-void HingeModel::BandSegement::Simulate() {}
+void HingeModel::BandSegement::ComputeScoreThis(adept::adouble &score) const {}
 
-adept::Vector HingeModel::BandSegement::GetPosition()
-{
-    return position_.inactive_link();
-}
+void HingeModel::BandSegement::ApplyGradientThis() {}
+
+adept::Vector HingeModel::BandSegement::GetPosition() const { return position_; }
+
+// ================ SEGMENT ================
 
 HingeModel::Segment::Segment(HingeModel *model, SDL2pp::Color vis_color)
     : model_(model), vis_color_(vis_color)
 {
 }
 
-void HingeModel::Segment::VisualiseThis(std::vector<Visualisation::Object> &objects)
+void HingeModel::Segment::VisualiseThis(std::vector<Visualisation::Object> &objects) const
 {
     auto o =
         Visualisation::Object({this->GetPosition(), next_->GetPosition()}, vis_color_);
@@ -114,10 +187,27 @@ void HingeModel::Segment::LinkForward(HingeModel::Segment *next)
 {
     next_ = next;
     next->LinkBackward(this);
-    model_->CoordinatesToCollisionZone(GetPosition());
+    auto collison_zone_coords = model_->CoordinatesToCollisionZone(GetPosition());
+    model_->collision_zones_[collison_zone_coords.first][collison_zone_coords.second]
+        ->RegisterSegment(this);
 }
 
 void HingeModel::Segment::LinkBackward(HingeModel::Segment *previous)
 {
     previous_ = previous;
+}
+
+bool HingeModel::Segment::Intersects(const Segment *s1, const Segment *s2)
+{
+    using namespace util;
+    // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+    adept::Vector p = s1->GetPosition();
+    adept::Vector r = s1->next_->GetPosition() - s1->GetPosition();
+    adept::Vector q = s2->GetPosition();
+    adept::Vector s = s2->next_->GetPosition() - s2->GetPosition();
+
+    double t = cross(q - p, s) / cross(r, s);
+    double u = cross(q - p, s) / cross(r, s);
+
+    return std::abs(cross(r, s)) > 0.001 && 0.0 <= t && t <= 1.0 && 0.0 <= u && u <= 1.0;
 }

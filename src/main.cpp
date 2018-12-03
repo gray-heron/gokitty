@@ -41,5 +41,6 @@ int main(int argc, char **argv)
         std::vector<Visualisation::Object> objects;
         model.Visualise(objects);
         vis.Tick(objects);
+        model.Optimize(main_stack);
     }
 }

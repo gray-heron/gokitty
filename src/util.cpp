@@ -27,3 +27,8 @@ boost::any ParseValue(const std::type_info &type_id, std::string value)
 
     throw Exception((string) "Unrecognized type: " + type_id.name());
 }
+
+double util::cross(const adept::Vector &v1, const adept::Vector &v2)
+{
+    return (v1[0] * v2[1]) - (v1[1] * v2[0]);
+}

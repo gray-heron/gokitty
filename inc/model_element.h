@@ -10,12 +10,14 @@
 class ModelElement
 {
     std::vector<ModelElement *> children_;
-    virtual void Simulate() = 0;
-    virtual void VisualiseThis(std::vector<Visualisation::Object> &objects) = 0;
+    virtual void ComputeScoreThis(adept::adouble &score) const = 0;
+    virtual void ApplyGradientThis() = 0;
+    virtual void VisualiseThis(std::vector<Visualisation::Object> &objects) const = 0;
 
   protected:
     void AddChild(ModelElement *child);
-    void Step();
+    void ComputeScore(adept::adouble &score);
+    void ApplyGradient();
 
   public:
     virtual ~ModelElement() = default;
