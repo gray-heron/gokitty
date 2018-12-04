@@ -116,7 +116,7 @@ void HingeModel::HingeCollisionZone::RegisterSegment(HingeModel::Segment *segmen
 // ================ HINGE ================
 
 HingeModel::Hinge::Hinge(HingeModel *model, adept::Vector position)
-    : HingeModel::Segment(model, SDL2pp::Color(0, 255, 0)), position_(position)
+    : HingeModel::Segment(model, false, SDL2pp::Color(0, 255, 0)), position_(position)
 {
     model->AddHinge(this);
 }
@@ -157,7 +157,7 @@ void HingeModel::Hinge::ApplyGradientThis()
 // ================ BAND_SEGMENT ================
 
 HingeModel::BandSegement::BandSegement(HingeModel *model, adept::Vector position)
-    : HingeModel::Segment(model, SDL2pp::Color(255, 0, 0)), position_(position)
+    : HingeModel::Segment(model, true, SDL2pp::Color(255, 0, 0)), position_(position)
 {
     model->AddBandSegment(this);
 }
@@ -170,8 +170,8 @@ adept::Vector HingeModel::BandSegement::GetPosition() const { return position_; 
 
 // ================ SEGMENT ================
 
-HingeModel::Segment::Segment(HingeModel *model, SDL2pp::Color vis_color)
-    : model_(model), vis_color_(vis_color)
+HingeModel::Segment::Segment(HingeModel *model, bool solid, SDL2pp::Color vis_color)
+    : model_(model), solid_(solid), vis_color_(vis_color)
 {
 }
 
@@ -187,9 +187,13 @@ void HingeModel::Segment::LinkForward(HingeModel::Segment *next)
 {
     next_ = next;
     next->LinkBackward(this);
-    auto collison_zone_coords = model_->CoordinatesToCollisionZone(GetPosition());
-    model_->collision_zones_[collison_zone_coords.first][collison_zone_coords.second]
-        ->RegisterSegment(this);
+
+    if (solid_)
+    {
+        auto collison_zone_coords = model_->CoordinatesToCollisionZone(GetPosition());
+        model_->collision_zones_[collison_zone_coords.first][collison_zone_coords.second]
+            ->RegisterSegment(this);
+    }
 }
 
 void HingeModel::Segment::LinkBackward(HingeModel::Segment *previous)
@@ -207,7 +211,7 @@ bool HingeModel::Segment::Intersects(const Segment *s1, const Segment *s2)
     adept::Vector s = s2->next_->GetPosition() - s2->GetPosition();
 
     double t = cross(q - p, s) / cross(r, s);
-    double u = cross(q - p, s) / cross(r, s);
+    double u = cross(q - p, r) / cross(r, s);
 
     return std::abs(cross(r, s)) > 0.001 && 0.0 <= t && t <= 1.0 && 0.0 <= u && u <= 1.0;
 }

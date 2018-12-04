@@ -38,9 +38,10 @@ class HingeModel : public ModelElement
         Segment *previous_;
 
         HingeModel *model_;
-        SDL2pp::Color vis_color_;
+        const bool solid_;
+        const SDL2pp::Color vis_color_;
 
-        Segment(HingeModel *model, SDL2pp::Color vis_color);
+        Segment(HingeModel *model, bool solid, SDL2pp::Color vis_color);
 
       public:
         virtual ~Segment() = default;

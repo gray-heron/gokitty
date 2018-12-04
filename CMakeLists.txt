@@ -8,11 +8,6 @@ include(CMakeRC.cmake)
 enable_testing()
 
 # ==============================================================================
-# cmake options
-# ==============================================================================
-option(USE_LOCAL_GTEST "uses local gtest" OFF)
-option(USE_LOCAL_SPDLOG "uses local spdlog" OFF)
-# ==============================================================================
 # names
 # ==============================================================================
 set(APP_NAME ${PROJECT_NAME})
@@ -34,7 +29,7 @@ include_directories(${CMAKE_BINARY_DIR}/dependencies/include)
 # dependencies
 # ==============================================================================
 
-find_package(Boost COMPONENTS system filesystem REQUIRED)
+find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
@@ -76,10 +71,9 @@ cmrc_add_resource_library(resources res/default_configuration.xml)
 # cmake targets
 # ==============================================================================
 
-add_executable(${APP_NAME}
+set(SRCS_NOMAIN 
   src/log.cpp
   src/config.cpp
-  src/main.cpp
   src/model_element.cpp
   src/visualisation.cpp
   src/hinge_model.cpp
@@ -93,14 +87,16 @@ add_executable(${APP_NAME}
   inc/log.h
   inc/hinge_model.h
   inc/util.h
-  inc/data_reader.h
-)
+  inc/data_reader.h)
 
-set_property(TARGET ${APP_NAME} PROPERTY CXX_STANDARD 11)
+add_library (${APP_NAME} STATIC ${SRCS_NOMAIN})
 
 target_link_libraries(${APP_NAME}
   ${Boost_LIBRARIES} pugixml SDL2pp ${SDL2_LIBRARIES} adept resources
 )
+
+add_executable(demo_app src/main.cpp)
+target_link_libraries(demo_app ${APP_NAME})
 
 add_dependencies(${APP_NAME} spdlog-dependency)
 add_dependencies(${APP_NAME} pugixml-dependency)
@@ -110,15 +106,19 @@ add_dependencies(${APP_NAME} adept-dependency)
 # ==============================================================================
 # tests
 # ==============================================================================
-ExternalProject_Add(googletest-dependency
-    URL https://github.com/google/googletest/archive/release-1.8.0.tar.gz
-    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/dependencies"
-  )
-  ADD_LIBRARY (gtest_main STATIC IMPORTED)
-  ADD_LIBRARY (gtest STATIC IMPORTED)
-  SET_PROPERTY(TARGET gtest_main PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/dependencies/lib/libgtest_main.a)
-  SET_PROPERTY(TARGET gtest PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/dependencies/lib/libgtest.a)
-  set(GTEST_BOTH_LIBRARIES gtest gtest_main)
-  #add_dependencies(${TEST_APP_NAME} googletest-dependency)
+file(GLOB TEST_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} tests/*.cpp)
 
- 
+foreach(testSrc ${TEST_SRCS})
+  get_filename_component(testName ${testSrc} NAME_WE)
+  set(testName "test_${testName}")
+  message("${testSrc} ${SRCS_NOMAIN}")
+  add_executable(${testName} "${testSrc};${SRCS_NOMAIN}")
+  target_link_libraries(${testName} ${PROJECT_NAME})
+
+  set_target_properties(${testName} PROPERTIES 
+      RUNTIME_OUTPUT_DIRECTORY  ${CMAKE_CURRENT_BINARY_DIR}/tests)
+
+  add_test(NAME ${testName} 
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/${testName} )
+endforeach(testSrc)
