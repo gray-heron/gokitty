@@ -132,12 +132,12 @@ void HingeModel::Hinge::ComputeScoreThis(adept::adouble &score) const
 
 Vector<2, false> HingeModel::Hinge::GetPosition() const
 {
-    return adept::aVector(position_).inactive_link();
+    return Vector<2, true>(position_).inactive_link();
 }
 
 void HingeModel::Hinge::ApplyGradientThis()
 {
-    auto old_position = adept::aVector(position_.inactive_link());
+    auto old_position = Vector<2, true>(position_.inactive_link());
     position_ -= position_.get_gradient() * model_->alpha_;
 
     auto from_collsion_zone = model_->CoordinatesToCollisionZone(GetPosition());
