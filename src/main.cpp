@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
     //====================
 
-    HingeModel model(40, 40, 25.0f);
+    HingeModel model(100, 100, 10.0f);
     Visualisation vis;
     DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
 

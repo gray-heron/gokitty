@@ -79,12 +79,12 @@ void HingeModel::HingeCollisionZone::ComputeScoreThis(adept::adouble &score) con
 void HingeModel::HingeCollisionZone::VisualiseThis(
     std::vector<Visualisation::Object> &objects) const
 {
-    objects.push_back(Visualisation::Object(
-        {position_, position_ + adept::Vector({collision_zone_side_, 0.0f})},
-        SDL2pp::Color(32, 32, 32)));
-    objects.push_back(Visualisation::Object(
-        {position_, position_ + adept::Vector({0.0f, collision_zone_side_})},
-        SDL2pp::Color(32, 32, 32)));
+    // objects.push_back(Visualisation::Object(
+    //    {position_, position_ + adept::Vector({collision_zone_side_, 0.0f})},
+    //    SDL2pp::Color(32, 32, 32)));
+    // objects.push_back(Visualisation::Object(
+    //    {position_, position_ + adept::Vector({0.0f, collision_zone_side_})},
+    //    SDL2pp::Color(32, 32, 32)));
     // objects.push_back(Visualisation::Object(
     //    {position_ + adept::Vector(collision_zone_side_, collision_zone_side_),
     //     position_ + adept::Vector(collision_zone_side_, 0)},
@@ -125,6 +125,8 @@ void HingeModel::Hinge::ComputeScoreThis(adept::adouble &score) const
 {
     auto position_diff = (static_cast<Hinge *>(next_)->position_ - position_);
     score += adept::sqrt(adept::sum(position_diff * position_diff));
+
+    adept::aMatrix a;
 }
 
 adept::Vector HingeModel::Hinge::GetPosition() const
@@ -134,8 +136,8 @@ adept::Vector HingeModel::Hinge::GetPosition() const
 
 void HingeModel::Hinge::ApplyGradientThis()
 {
-    adept::Vector new_position =
-        position_.inactive_link() - position_.get_gradient() * model_->alpha_;
+    auto old_position = adept::aVector(position_.inactive_link());
+    position_ -= position_.get_gradient() * model_->alpha_;
 
     auto from_collsion_zone = model_->CoordinatesToCollisionZone(GetPosition());
     auto to_collsion_zone = model_->CoordinatesToCollisionZone(GetPosition());
@@ -144,14 +146,14 @@ void HingeModel::Hinge::ApplyGradientThis()
         for (int czy = from_collsion_zone.second; czy < to_collsion_zone.second + 1;
              czy++)
         {
-            if (model_->collision_zones_[czx][czy]->Collides(this))
+            if (model_->collision_zones_[czx][czy]->Collides(this) ||
+                model_->collision_zones_[czx][czy]->Collides(previous_))
             {
+                position_ = old_position;
                 return;
             }
         }
     }
-
-    position_ = new_position;
 }
 
 // ================ BAND_SEGMENT ================
