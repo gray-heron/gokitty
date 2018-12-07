@@ -12,14 +12,14 @@ class TestSegment : public HingeModel::Segment
     void VisualiseThis(std::vector<Visualisation::Object> &objects) const override {}
 
   public:
-    adept::Vector pos_;
-    TestSegment(adept::Vector pos)
+    Vector<2, false> pos_;
+    TestSegment(Vector<2, false> pos)
         : Segment(nullptr, false, SDL2pp::Color()), pos_(pos){};
-    adept::Vector GetPosition() const override { return pos_; }
+    Vector<2, false> GetPosition() const override { return pos_; }
 };
 
-bool IntersectionTest(adept::Vector v11, adept::Vector v12, adept::Vector v21,
-                      adept::Vector v22)
+bool IntersectionTest(Vector<2, false> v11, Vector<2, false> v12, Vector<2, false> v21,
+                      Vector<2, false> v22)
 {
     TestSegment flat_left(v11);
     TestSegment flat_right(v12);

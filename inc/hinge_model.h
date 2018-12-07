@@ -1,6 +1,8 @@
 #pragma once
 
 #include "model_element.h"
+#include "util.h"
+
 #include <adept_arrays.h>
 #include <set>
 
@@ -16,13 +18,13 @@ class HingeModel : public ModelElement
         void ApplyGradientThis() override;
         void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;
 
-        adept::Vector position_;
+        Vector<2, false> position_;
         float collision_zone_side_;
 
         std::set<Segment *> segments_;
 
       public:
-        HingeCollisionZone(HingeModel *model, adept::Vector position_, float side);
+        HingeCollisionZone(HingeModel *model, Vector<2, false> position_, float side);
         bool Collides(Segment *seg) const;
         void RegisterSegment(HingeModel::Segment *segment_);
     };
@@ -31,7 +33,7 @@ class HingeModel : public ModelElement
     {
         void LinkBackward(Segment *previous);
         void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;
-        virtual adept::Vector GetPosition() const = 0;
+        virtual Vector<2, false> GetPosition() const = 0;
 
       protected:
         Segment *next_;
@@ -54,11 +56,11 @@ class HingeModel : public ModelElement
       private:
         void ComputeScoreThis(adept::adouble &score) const override;
         void ApplyGradientThis() override;
-        adept::aVector position_;
+        Vector<2, true> position_;
 
       public:
-        Hinge(HingeModel *model, adept::Vector position);
-        adept::Vector GetPosition() const override;
+        Hinge(HingeModel *model, Vector<2, false> position);
+        Vector<2, false> GetPosition() const override;
     };
 
     class BandSegement : public Segment
@@ -66,16 +68,16 @@ class HingeModel : public ModelElement
       private:
         void ComputeScoreThis(adept::adouble &score) const override;
         void ApplyGradientThis() override;
-        adept::Vector position_;
+        Vector<2, false> position_;
 
       public:
-        BandSegement(HingeModel *model, adept::Vector position);
-        adept::Vector GetPosition() const override;
+        BandSegement(HingeModel *model, Vector<2, false> position);
+        Vector<2, false> GetPosition() const override;
     };
 
   private:
     std::vector<std::vector<HingeCollisionZone *>> collision_zones_;
-    std::pair<uint32_t, uint32_t> CoordinatesToCollisionZone(adept::Vector pos);
+    std::pair<uint32_t, uint32_t> CoordinatesToCollisionZone(Vector<2, false> pos);
 
     uint32_t width_;
     uint32_t height_;

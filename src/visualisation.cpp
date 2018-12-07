@@ -13,15 +13,15 @@ Visualisation::Visualisation()
               Config::inst().GetOption<int>("resx"),
               Config::inst().GetOption<int>("resy"), 0),
       renderer_(window_, -1, SDL_RENDERER_ACCELERATED),
-      windows_offset_(adept::Vector({Config::inst().GetOption<int>("resx") / 2,
-                                     Config::inst().GetOption<int>("resy") / 2})),
+      windows_offset_(Vector<2, false>({Config::inst().GetOption<int>("resx") / 2,
+                                        Config::inst().GetOption<int>("resy") / 2})),
       camera_pos_(-windows_offset_), zoom_(1.0f), exit_(false)
 {
     renderer_.SetLogicalSize(Config::inst().GetOption<int>("resx"),
                              Config::inst().GetOption<int>("resy"));
 }
 
-Point Visualisation::TensorToPoint(adept::Vector t) { return Point(t[0], t[1]); }
+Point Visualisation::TensorToPoint(Vector<2, false> t) { return Point(t[0], t[1]); }
 
 void Visualisation::Tick(const std::vector<Object> &objects)
 {
@@ -55,16 +55,16 @@ void Visualisation::HandleKeyDown(SDL_KeyboardEvent key)
     switch (key.keysym.sym)
     {
     case SDLK_UP:
-        camera_pos_ += adept::Vector({0.0f, 30.0f}) / zoom_;
+        camera_pos_ += Vector<2, false>({0.0f, 30.0f}) / zoom_;
         break;
     case SDLK_DOWN:
-        camera_pos_ += adept::Vector({0.0f, -30.0f}) / zoom_;
+        camera_pos_ += Vector<2, false>({0.0f, -30.0f}) / zoom_;
         break;
     case SDLK_LEFT:
-        camera_pos_ += adept::Vector({30.0f, 0.0f}) / zoom_;
+        camera_pos_ += Vector<2, false>({30.0f, 0.0f}) / zoom_;
         break;
     case SDLK_RIGHT:
-        camera_pos_ += adept::Vector({-30.0f, 0.0f}) / zoom_;
+        camera_pos_ += Vector<2, false>({-30.0f, 0.0f}) / zoom_;
         break;
     case SDLK_KP_PLUS:
         zoom_ *= 2.0f;
