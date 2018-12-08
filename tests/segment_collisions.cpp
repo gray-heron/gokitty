@@ -34,12 +34,30 @@ bool IntersectionTest(Vector<2, false> v11, Vector<2, false> v12, Vector<2, fals
 
 BOOST_AUTO_TEST_CASE(IntersectionFunction)
 {
-    BOOST_CHECK(
-        IntersectionTest({-1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, -1.0f}, {0.0f, 1.0f}));
-    BOOST_CHECK(
-        !IntersectionTest({-1.0f, 10.0f}, {1.0f, 10.0f}, {0.0f, -1.0f}, {0.0f, 1.0f}));
-    BOOST_CHECK(IntersectionTest({93.0f, 75.0f}, {380.0f, 500.0f}, {15.0f, 280.0f},
-                                 {750.0f, 300.0f}));
-    BOOST_CHECK(!IntersectionTest({100.0f, 200.0f}, {200.0f, 300.0f}, {150.0f, 250.0f},
-                                  {250.0f, 350.0f}));
+    BOOST_CHECK(IntersectionTest({{-1.0f, 0.0f}}, {{1.0f, 0.0f}}, {{0.0f, -1.0f}},
+                                 {{0.0f, 1.0f}}));
+    BOOST_CHECK(!IntersectionTest({{-1.0f, 10.0f}}, {{1.0f, 10.0f}}, {{0.0f, -1.0f}},
+                                  {{0.0f, 1.0f}}));
+    BOOST_CHECK(IntersectionTest({{93.0f, 75.0f}}, {{380.0f, 500.0f}}, {{15.0f, 280.0f}},
+                                 {{750.0f, 300.0f}}));
+    BOOST_CHECK(!IntersectionTest({{100.0f, 200.0f}}, {{200.0f, 300.0f}},
+                                  {{150.0f, 250.0f}}, {{250.0f, 350.0f}}));
+};
+
+BOOST_AUTO_TEST_CASE(CircumcircleRadius)
+{
+    adept::Stack stack;
+
+    Vector<2, true> p1({{-2.0, 0.0}});
+    Vector<2, true> p2({{0.0, 2.0}});
+    Vector<2, true> p3({{2.0, 0.0}});
+    stack.new_recording();
+    adept::adouble r = util::CircumcircleRadius(p1, p2, p3);
+
+    r.set_gradient(1.0);
+    stack.reverse();
+
+    std::cerr << p1.get_gradient();
+
+    BOOST_CHECK_CLOSE(r.value(), 1.0, 0.0001);
 };

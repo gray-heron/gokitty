@@ -16,7 +16,7 @@ HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_sid
         {
             auto collision_zone = new HingeCollisionZone(
                 this,
-                Vector<2, false>({x * collision_zone_side, y * collision_zone_side}),
+                Vector<2, false>({{x * collision_zone_side, y * collision_zone_side}}),
                 collision_zone_side);
             (collision_zones_.end() - 1)->push_back(collision_zone);
             AddChild(collision_zone);
@@ -29,11 +29,11 @@ std::pair<uint32_t, uint32_t> HingeModel::CoordinatesToCollisionZone(Vector<2, f
 
     std::pair<uint32_t, uint32_t> ret;
 
-    ASSERT(pos[0] < collision_zone_side_ * float(width_));
-    ASSERT(pos[1] < collision_zone_side_ * float(height_));
+    ASSERT(pos(0, 0) < collision_zone_side_ * float(width_));
+    ASSERT(pos(0, 1) < collision_zone_side_ * float(height_));
 
-    ret.first = pos[0] / collision_zone_side_;
-    ret.second = pos[1] / collision_zone_side_;
+    ret.first = pos(0, 0) / collision_zone_side_;
+    ret.second = pos(0, 1) / collision_zone_side_;
 
     return ret;
 }
@@ -57,7 +57,7 @@ void HingeModel::ApplyGradientThis() {}
 double HingeModel::Optimize(adept::Stack &stack)
 {
     stack.new_recording();
-    adept::adouble score = 0.0;
+    adept::aReal score = 0.0;
     ComputeScore(score);
     score.set_gradient(1.0);
     stack.reverse();
@@ -117,17 +117,22 @@ void HingeModel::HingeCollisionZone::RegisterSegment(HingeModel::Segment *segmen
 // ================ HINGE ================
 
 HingeModel::Hinge::Hinge(HingeModel *model, Vector<2, false> position)
-    : HingeModel::Segment(model, false, SDL2pp::Color(0, 255, 0)), position_(position)
+    : HingeModel::Segment(model, false, SDL2pp::Color(0, 255, 0)),
+      zero_position_(position), position_(position), crossposition_(0.0f)
 {
     model->AddHinge(this);
 }
 
 void HingeModel::Hinge::ComputeScoreThis(adept::adouble &score) const
 {
+    // position_ = zero_position_ + crossposition_vector_ * crossposition_;
     auto position_diff = (static_cast<Hinge *>(next_)->position_ - position_);
-    score += adept::sqrt(adept::sum(position_diff * position_diff));
+    score += adept::sum(position_diff * position_diff) * 0.01;
 
-    adept::aMatrix a;
+    auto r = util::CircumcircleRadius(static_cast<Hinge *>(previous_)->position_,
+                                      position_, static_cast<Hinge *>(next_)->position_);
+
+    score += (8.0 / (r)) * (8.0 / (r));
 }
 
 Vector<2, false> HingeModel::Hinge::GetPosition() const
@@ -137,7 +142,14 @@ Vector<2, false> HingeModel::Hinge::GetPosition() const
 
 void HingeModel::Hinge::ApplyGradientThis()
 {
-    auto old_position = Vector<2, true>(position_.inactive_link());
+    /*
+    crossposition_ -= crossposition_.get_gradient() * model_->alpha_;
+    if (adept::abs(crossposition_) > 1.0)
+        crossposition_ /= adept::abs(crossposition_);
+
+    position_ = zero_position_ + crossposition_vector_ * crossposition_;
+    */
+    auto old_position = Vector<2, true>(position_);
     position_ -= position_.get_gradient() * model_->alpha_;
 
     auto from_collsion_zone = model_->CoordinatesToCollisionZone(GetPosition());
@@ -155,6 +167,17 @@ void HingeModel::Hinge::ApplyGradientThis()
             }
         }
     }
+}
+
+void HingeModel::Hinge::LinkForward(Segment *next)
+{
+    Segment::LinkForward(next);
+    auto heading = Vector<2, true>(next_->GetPosition() - position_);
+    heading /= adept::norm2(heading);
+    crossposition_vector_ =
+        Vector<2, false>({{-heading[0][1].value(), heading[0][0].value()}}) * 10.4;
+
+    position_ = zero_position_ + crossposition_vector_ * crossposition_;
 }
 
 // ================ BAND_SEGMENT ================

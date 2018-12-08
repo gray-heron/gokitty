@@ -33,7 +33,6 @@ class HingeModel : public ModelElement
     {
         void LinkBackward(Segment *previous);
         void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;
-        virtual Vector<2, false> GetPosition() const = 0;
 
       protected:
         Segment *next_;
@@ -47,8 +46,9 @@ class HingeModel : public ModelElement
 
       public:
         virtual ~Segment() = default;
-        void LinkForward(Segment *next);
+        virtual void LinkForward(Segment *next);
         static bool Intersects(const Segment *s1, const Segment *s2);
+        virtual Vector<2, false> GetPosition() const = 0;
     };
 
     class Hinge : public Segment
@@ -56,10 +56,15 @@ class HingeModel : public ModelElement
       private:
         void ComputeScoreThis(adept::adouble &score) const override;
         void ApplyGradientThis() override;
+
+        const Vector<2, false> zero_position_;
         Vector<2, true> position_;
+        adept::adouble crossposition_;
+        Vector<2, false> crossposition_vector_;
 
       public:
         Hinge(HingeModel *model, Vector<2, false> position);
+        void LinkForward(Segment *next) override;
         Vector<2, false> GetPosition() const override;
     };
 

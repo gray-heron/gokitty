@@ -51,7 +51,7 @@ ExternalProject_Add(sdl2-dependency
 
 ExternalProject_Add(adept-dependency
   URL http://www.met.reading.ac.uk/clouds/adept/adept-2.0.5.tar.gz
-  CONFIGURE_COMMAND cd ../adept-dependency/ && ./configure --prefix=${CMAKE_BINARY_DIR}/dependencies
+  CONFIGURE_COMMAND cd ../adept-dependency/ && ./configure CXXFLAGS=-O3 --prefix=${CMAKE_BINARY_DIR}/dependencies
   BUILD_COMMAND make -C ../adept-dependency
   INSTALL_COMMAND make -C ../adept-dependency install
   )

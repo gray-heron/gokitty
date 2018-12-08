@@ -41,7 +41,8 @@ int main(int argc, char **argv)
         std::vector<Visualisation::Object> objects;
         model.Visualise(objects);
         vis.Tick(objects);
-        if (model.Optimize(main_stack) < 1395)
-            return 0;
+        model.Optimize(main_stack);
+        // if (model.Optimize(main_stack) < 1395)
+        //    return 0;
     }
 }
