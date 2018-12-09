@@ -3,15 +3,15 @@
     <verbose type="bool">false</verbose>
     <config type="string"></config>
 
-    <resx type="int">3500</resx>
-    <resy type="int">2000</resy>
+    <resx type="int">1600</resx>
+    <resy type="int">1440</resy>
 
     <angle_factor type="float">0.1965</angle_factor>
     <forward_factor type="float">0.4</forward_factor>
-    <bound_factor type="float">1.4</bound_factor>
-    <band_separation type="float">7.5f</band_separation>
+    <bound_factor type="float">6.4</bound_factor>
+    <band_separation type="float">15.5f</band_separation>
 
-    <alpha type="float">0.03</alpha>
+    <alpha type="float">0.5</alpha>
 
     <track type="string">data/tracks/street.xml</track>
 </configuration>

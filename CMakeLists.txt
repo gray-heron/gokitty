@@ -50,11 +50,11 @@ ExternalProject_Add(sdl2-dependency
 )
 
 ExternalProject_Add(adept-dependency
-  URL http://www.met.reading.ac.uk/clouds/adept/adept-2.0.5.tar.gz
-  CONFIGURE_COMMAND cd ../adept-dependency/ && ./configure CXXFLAGS=-O3 --prefix=${CMAKE_BINARY_DIR}/dependencies
+  URL https://github.com/rjhogan/Adept-2/archive/master.tar.gz
+  CONFIGURE_COMMAND cd ../adept-dependency/ && autoreconf -i && ./configure CXXFLAGS=-O3 --prefix=${CMAKE_BINARY_DIR}/dependencies
   BUILD_COMMAND make -C ../adept-dependency
   INSTALL_COMMAND make -C ../adept-dependency install
-  )
+)
 
 FIND_PACKAGE(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
@@ -111,8 +111,7 @@ file(GLOB TEST_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} tests/*.cpp)
 foreach(testSrc ${TEST_SRCS})
   get_filename_component(testName ${testSrc} NAME_WE)
   set(testName "test_${testName}")
-  message("${testSrc} ${SRCS_NOMAIN}")
-  add_executable(${testName} "${testSrc};${SRCS_NOMAIN}")
+  add_executable(${testName} "${testSrc}")
   target_link_libraries(${testName} ${PROJECT_NAME})
 
   set_target_properties(${testName} PROPERTIES 
