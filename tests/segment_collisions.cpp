@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE "Quick n dirty protocol tests"
+#define BOOST_TEST_MODULE "Segment collision tests"
 
 #include "hinge_model.h"
 #include <algorithm>
@@ -7,8 +7,8 @@
 
 class TestSegment : public HingeModel::Segment
 {
-    void ComputeScoreThis(adept::adouble &score) const override {}
-    void ApplyGradientThis() override {}
+    void ComputeScoreThis(adept::aReal &score) const override {}
+    void ApplyGradientThis(double) override {}
     void VisualiseThis(std::vector<Visualisation::Object> &objects) const override {}
 
   public:
@@ -51,13 +51,11 @@ BOOST_AUTO_TEST_CASE(CircumcircleRadius)
     Vector<2, true> p1({{-2.0, 0.0}});
     Vector<2, true> p2({{0.0, 2.0}});
     Vector<2, true> p3({{2.0, 0.0}});
-    stack.new_recording();
-    adept::adouble r = util::CircumcircleRadius(p1, p2, p3);
 
+    stack.new_recording();
+    adept::aReal r = util::CircumcircleRadius(p1, p2, p3);
     r.set_gradient(1.0);
     stack.reverse();
 
-    std::cerr << p1.get_gradient();
-
-    BOOST_CHECK_CLOSE(r.value(), 1.0, 0.0001);
+    BOOST_CHECK_CLOSE(r.value(), 2.0, 0.0001);
 };

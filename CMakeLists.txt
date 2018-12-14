@@ -51,7 +51,7 @@ ExternalProject_Add(sdl2-dependency
 
 ExternalProject_Add(adept-dependency
   URL https://github.com/rjhogan/Adept-2/archive/master.tar.gz
-  CONFIGURE_COMMAND cd ../adept-dependency/ && autoreconf -i && ./configure CXXFLAGS=-O3 --prefix=${CMAKE_BINARY_DIR}/dependencies
+  CONFIGURE_COMMAND cd ../adept-dependency/ && autoreconf -i && ./configure CXXFLAGS=-O2 --prefix=${CMAKE_BINARY_DIR}/dependencies
   BUILD_COMMAND make -C ../adept-dependency
   INSTALL_COMMAND make -C ../adept-dependency install
 )

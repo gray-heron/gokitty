@@ -4,6 +4,7 @@
 #include "util.h"
 
 #include <adept_arrays.h>
+#include <boost/optional.hpp>
 #include <set>
 
 class HingeModel : public ModelElement
@@ -14,8 +15,8 @@ class HingeModel : public ModelElement
     class HingeCollisionZone : public ModelElement
     {
       private:
-        void ComputeScoreThis(adept::adouble &score) const override;
-        void ApplyGradientThis() override;
+        void ComputeScoreThis(adept::aReal &score) const override;
+        void ApplyGradientThis(double score_normalization) override;
         void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;
 
         Vector<2, false> position_;
@@ -54,13 +55,16 @@ class HingeModel : public ModelElement
     class Hinge : public Segment
     {
       private:
-        void ComputeScoreThis(adept::adouble &score) const override;
-        void ApplyGradientThis() override;
+        void ComputeScoreThis(adept::aReal &score) const override;
+        void ApplyGradientThis(double score_normalization) override;
+        static SDL2pp::Color SpeedToColor(double speed);
 
         const Vector<2, false> zero_position_;
-        Vector<2, true> position_;
-        adept::adouble crossposition_;
+        mutable Vector<2, true> position_;
+        adept::aReal crossposition_;
         Vector<2, false> crossposition_vector_;
+
+        adept::aReal speed_;
 
       public:
         Hinge(HingeModel *model, Vector<2, false> position);
@@ -71,8 +75,8 @@ class HingeModel : public ModelElement
     class BandSegement : public Segment
     {
       private:
-        void ComputeScoreThis(adept::adouble &score) const override;
-        void ApplyGradientThis() override;
+        void ComputeScoreThis(adept::aReal &score) const override;
+        void ApplyGradientThis(double score_normalization) override;
         Vector<2, false> position_;
 
       public:
@@ -82,17 +86,19 @@ class HingeModel : public ModelElement
 
   private:
     std::vector<std::vector<HingeCollisionZone *>> collision_zones_;
-    std::pair<uint32_t, uint32_t> CoordinatesToCollisionZone(Vector<2, false> pos);
+    std::pair<int, int> CoordinatesToCollisionZone(Vector<2, false> pos);
 
     uint32_t width_;
     uint32_t height_;
-    float collision_zone_side_;
-    float alpha_;
+    double collision_zone_side_;
+    double alpha_;
+    double max_centrifugal_force_;
+    boost::optional<std::pair<double, double>> first_last_score_;
 
     Hinge *first_hinge_;
 
-    void ComputeScoreThis(adept::adouble &score) const override;
-    void ApplyGradientThis() override;
+    void ComputeScoreThis(adept::aReal &score) const override;
+    void ApplyGradientThis(double score_normalization) override;
     void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;
 
     void AddHinge(Hinge *h);

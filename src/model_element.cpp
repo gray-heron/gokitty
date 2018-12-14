@@ -2,7 +2,7 @@
 
 void ModelElement::AddChild(ModelElement *child) { children_.push_back(child); }
 
-void ModelElement::ComputeScore(adept::adouble &score)
+void ModelElement::ComputeScore(adept::aReal &score)
 {
     ComputeScoreThis(score);
 
@@ -21,11 +21,11 @@ void ModelElement::Visualise(std::vector<Visualisation::Object> &objects)
     }
 }
 
-void ModelElement::ApplyGradient()
+void ModelElement::ApplyGradient(double score_normalization)
 {
-    ApplyGradientThis();
+    ApplyGradientThis(score_normalization);
     for (auto child : children_)
     {
-        child->ApplyGradient();
+        child->ApplyGradient(score_normalization);
     }
 }

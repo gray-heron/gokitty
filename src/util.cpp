@@ -32,9 +32,9 @@ boost::any ParseValue(const std::type_info &type_id, std::string value)
 
 adept::aReal util::det33(const adept::aMatrix33 &m)
 {
-    auto p1 = m(1, 1) * m(2, 2) - m(2, 1) * m(1, 2);
-    auto p2 = m(0, 1) * m(2, 2) - m(2, 1) * m(0, 2);
-    auto p3 = m(0, 1) * m(1, 2) - m(1, 1) * m(0, 2);
+    adept::aReal p1 = m(1, 1) * m(2, 2) - m(2, 1) * m(1, 2);
+    adept::aReal p2 = m(0, 1) * m(2, 2) - m(2, 1) * m(0, 2);
+    adept::aReal p3 = m(0, 1) * m(1, 2) - m(1, 1) * m(0, 2);
 
     return m(0, 0) * p1 - m(1, 0) * p2 + m(2, 0) * p3;
 }
@@ -72,7 +72,7 @@ adept::aReal util::CircumcircleRadius(const Vector<2, true> &p1,
         p1(0, 0), p1(0, 1), 1,
         p2(0, 0), p2(0, 1), 1,
         p3(0, 0), p3(0, 1), 1);
-    auto a = det33(aM);
+    adept::aReal a = det33(aM);
 
     adept::aReal r1 = p1(0, 0) * p1(0, 0) + p1(0, 1) * p1(0, 1);
     adept::aReal r2 = p2(0, 0) * p2(0, 0) + p2(0, 1) * p2(0, 1);
@@ -82,19 +82,19 @@ adept::aReal util::CircumcircleRadius(const Vector<2, true> &p1,
             r1, p1(0, 1), 1.0,
             r2, p2(0, 1), 1.0,
             r3, p3(0, 1), 1.0);
-    auto bx = det33(bxM);
+    adept::aReal bx = det33(bxM);
 
     adept::aMatrix33 byM = fixme(
             r1, p1(0,0), 1.0,
             r2, p2(0,0), 1.0,
             r3, p3(0,0), 1.0);
-    auto by = det33(byM);
+    adept::aReal by = det33(byM);
 
     adept::aMatrix33 cM = fixme(
             r1, p1(0, 0), p1(0, 1),
             r2, p2(0, 0), p2(0, 1),
             r3, p3(0, 0), p3(0, 1));
-    auto c = -det33(cM);
+    adept::aReal c = -det33(cM);
 
     // clang-format on
 
