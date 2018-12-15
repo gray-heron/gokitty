@@ -7,9 +7,12 @@
 
 class TestSegment : public HingeModel::Segment
 {
+    void SetupEquationsThis() override {}
     void ComputeScoreThis(adept::aReal &score) const override {}
     void ApplyGradientThis(double) override {}
     void VisualiseThis(std::vector<Visualisation::Object> &objects) const override {}
+
+    std::string GetTooltip() const override { return "mock segment"; };
 
   public:
     Vector<2, false> pos_;

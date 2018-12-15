@@ -12,7 +12,6 @@ int main(int argc, char **argv)
 {
     Log log("main");
     log.Info() << "gokitty demo application";
-    adept::Stack main_stack;
 
     Config::inst().Load(argc, argv);
 
@@ -32,17 +31,36 @@ int main(int argc, char **argv)
 
     //====================
 
+    adept::Stack main_stack;
     HingeModel model(100, 100, 10.0f);
     Visualisation vis;
     DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
 
-    while (!vis.ExitRequested())
+    bool optimization_paused = false;
+    bool exit_requested = false;
+
+    while (!exit_requested)
     {
         std::vector<Visualisation::Object> objects;
         model.Visualise(objects);
         vis.Tick(objects);
-        model.Optimize(main_stack);
-        // if (model.Optimize(main_stack) < 1395)
-        //    return 0;
+
+        if (!optimization_paused)
+            model.Optimize(main_stack);
+
+        while (auto action = vis.DequeueAction())
+        {
+            switch (*action)
+            {
+            case Visualisation::Exit:
+                exit_requested = true;
+                break;
+            case Visualisation::OptimizationPause:
+                optimization_paused = !optimization_paused;
+                break;
+            default:
+                ASSERT(0, "Action not implemented!")
+            }
+        }
     }
 }

@@ -4,14 +4,37 @@
 
 #include <SDL2pp/SDL2pp.hh>
 #include <adept_arrays.h>
+#include <boost/optional/optional.hpp>
+#include <functional>
+#include <queue>
 
+#include "log.h"
 #include "util.h"
 
 class Visualisation
 {
+  public:
+    class TooltipInterface
+    {
+      public:
+        virtual std::string GetTooltip() const = 0;
+    };
+
+    enum Action
+    {
+        OptimizationPause,
+        Exit
+    };
+
+    using Object = std::tuple<Vector<2, false>, Vector<2, false>,
+                              const TooltipInterface *, SDL2pp::Color>;
+
   private:
-    SDL2pp::Point TensorToPoint(Vector<2, false> t);
+    static SDL2pp::Point TensorToPoint(Vector<2, false> t);
+    Vector<2, false> Projection(Vector<2, false> pos);
+
     void HandleKeyDown(SDL_KeyboardEvent key);
+    void HandleMouseKeyDown(SDL_MouseButtonEvent btn, const std::vector<Object> &objects);
 
     SDL2pp::SDL sdl_;
     SDL2pp::Window window_;
@@ -21,13 +44,13 @@ class Visualisation
     Vector<2, false> windows_offset_;
     Vector<2, false> camera_pos_;
 
-    bool exit_;
+    std::queue<Action> action_queue_;
+
+    Log log_{"Visualization"};
 
   public:
-    using Object =
-        std::tuple<std::pair<Vector<2, false>, Vector<2, false>>, SDL2pp::Color>;
-
     Visualisation();
+
+    boost::optional<Visualisation::Action> DequeueAction();
     void Tick(const std::vector<Object> &objects);
-    bool ExitRequested();
 };

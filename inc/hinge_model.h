@@ -15,6 +15,7 @@ class HingeModel : public ModelElement
     class HingeCollisionZone : public ModelElement
     {
       private:
+        void SetupEquationsThis() override;
         void ComputeScoreThis(adept::aReal &score) const override;
         void ApplyGradientThis(double score_normalization) override;
         void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;
@@ -30,7 +31,7 @@ class HingeModel : public ModelElement
         void RegisterSegment(HingeModel::Segment *segment_);
     };
 
-    class Segment : public ModelElement
+    class Segment : public ModelElement, public Visualisation::TooltipInterface
     {
         void LinkBackward(Segment *previous);
         void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;
@@ -55,8 +56,12 @@ class HingeModel : public ModelElement
     class Hinge : public Segment
     {
       private:
+        void SetupEquationsThis() override;
         void ComputeScoreThis(adept::aReal &score) const override;
         void ApplyGradientThis(double score_normalization) override;
+
+        std::string GetTooltip() const override;
+
         static SDL2pp::Color SpeedToColor(double speed);
 
         const Vector<2, false> zero_position_;
@@ -75,8 +80,12 @@ class HingeModel : public ModelElement
     class BandSegement : public Segment
     {
       private:
+        void SetupEquationsThis() override;
         void ComputeScoreThis(adept::aReal &score) const override;
         void ApplyGradientThis(double score_normalization) override;
+
+        std::string GetTooltip() const override;
+
         Vector<2, false> position_;
 
       public:
@@ -93,10 +102,12 @@ class HingeModel : public ModelElement
     double collision_zone_side_;
     double alpha_;
     double max_centrifugal_force_;
+    double max_acceleration_;
     boost::optional<std::pair<double, double>> first_last_score_;
 
     Hinge *first_hinge_;
 
+    void SetupEquationsThis() override;
     void ComputeScoreThis(adept::aReal &score) const override;
     void ApplyGradientThis(double score_normalization) override;
     void VisualiseThis(std::vector<Visualisation::Object> &objects) const override;

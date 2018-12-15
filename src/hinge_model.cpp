@@ -8,7 +8,8 @@ using std::get;
 HingeModel::HingeModel(uint32_t width, uint32_t height, float collision_zone_side)
     : width_(width), height_(height), collision_zone_side_(collision_zone_side),
       alpha_(Config::inst().GetOption<float>("alpha")), first_hinge_(nullptr),
-      max_centrifugal_force_(Config::inst().GetOption<float>("max_centrifugal_force"))
+      max_centrifugal_force_(Config::inst().GetOption<float>("max_centrifugal_force")),
+      max_acceleration_(Config::inst().GetOption<float>("max_acceleration"))
 {
     for (uint32_t x = 0; x < width; ++x)
     {
@@ -48,6 +49,8 @@ void HingeModel::AddHinge(Hinge *h)
 
 void HingeModel::AddBandSegment(BandSegement *bs) { AddChild(bs); }
 
+void HingeModel::SetupEquationsThis() {}
+
 void HingeModel::ComputeScoreThis(adept::aReal &score) const {}
 
 void HingeModel::VisualiseThis(std::vector<Visualisation::Object> &objects) const {}
@@ -61,10 +64,11 @@ double HingeModel::Optimize(adept::Stack &stack)
         score_normalization = first_last_score_->first / first_last_score_->second;
 
     adept::aReal score = 0.0;
-    adept::aReal score2 = 0.0;
     stack.new_recording();
-    ComputeScore(score2);
+
+    SetupEquations();
     ComputeScore(score);
+
     score.set_gradient(1.0); // could use this for score_normalization
     stack.reverse();
     ApplyGradient(score_normalization);
@@ -109,6 +113,8 @@ void HingeModel::HingeCollisionZone::VisualiseThis(
     //    SDL2pp::Color(32, 32, 32)));
 }
 
+void HingeModel::HingeCollisionZone::SetupEquationsThis() {}
+
 void HingeModel::HingeCollisionZone::ApplyGradientThis(double score_normalization) {}
 
 bool HingeModel::HingeCollisionZone::Collides(Segment *seg) const
@@ -136,10 +142,13 @@ HingeModel::Hinge::Hinge(HingeModel *model, Vector<2, false> position)
     model->AddHinge(this);
 }
 
-void HingeModel::Hinge::ComputeScoreThis(adept::aReal &score) const
+void HingeModel::Hinge::SetupEquationsThis()
 {
     position_ = zero_position_ + crossposition_vector_ * crossposition_;
+}
 
+void HingeModel::Hinge::ComputeScoreThis(adept::aReal &score) const
+{
     Vector<2, true> position_diff_n =
         (static_cast<Hinge *>(next_)->position_ - position_);
     Vector<2, true> position_diff_p =
@@ -155,18 +164,22 @@ void HingeModel::Hinge::ComputeScoreThis(adept::aReal &score) const
     adept::aReal centrifugal_force = (speed_ * speed_) / r;
 
     score += -1.0 / (centrifugal_force - model_->max_centrifugal_force_);
+    score += -1.0 / (adept::abs(speed_ - static_cast<Hinge *>(next_)->speed_) /
+                         adept::norm2(position_diff_n) -
+                     model_->max_acceleration_);
 
     score += len / speed_;
 }
 
 void HingeModel::Hinge::ApplyGradientThis(double score_normalization)
 {
-    crossposition_ -= crossposition_.get_gradient() * model_->alpha_;
+    speed_ -= speed_.get_gradient() * model_->alpha_ * score_normalization * 3.0;
+    crossposition_ -=
+        crossposition_.get_gradient() * model_->alpha_ * score_normalization;
     if (adept::abs(crossposition_) > 1.0)
         crossposition_ /= adept::abs(crossposition_);
 
-    position_ = zero_position_ + crossposition_vector_ * crossposition_;
-    speed_ -= speed_.get_gradient() * model_->alpha_ * score_normalization * 3;
+    vis_color_ = SpeedToColor(speed_.value());
 
     /*
     auto from_collsion_zone = model_->CoordinatesToCollisionZone(GetPosition());
@@ -194,7 +207,6 @@ void HingeModel::Hinge::ApplyGradientThis(double score_normalization)
             }
         }
     */
-    vis_color_ = SpeedToColor(speed_.value());
 }
 
 void HingeModel::Hinge::LinkForward(Segment *next)
@@ -206,6 +218,15 @@ void HingeModel::Hinge::LinkForward(Segment *next)
         Vector<2, false>({{-heading[0][1].value(), heading[0][0].value()}}) * 6.4;
 
     position_ = zero_position_ + crossposition_vector_ * crossposition_;
+}
+
+std::string HingeModel::Hinge::GetTooltip() const
+{
+    std::stringstream ret;
+    ret << "Hinge | position = " << position_;
+    ret << ", speed = " << speed_;
+
+    return ret.str();
 }
 
 Vector<2, false> HingeModel::Hinge::GetPosition() const
@@ -231,9 +252,13 @@ HingeModel::BandSegement::BandSegement(HingeModel *model, Vector<2, false> posit
     model->AddBandSegment(this);
 }
 
+void HingeModel::BandSegement::SetupEquationsThis() {}
+
 void HingeModel::BandSegement::ComputeScoreThis(adept::aReal &score) const {}
 
 void HingeModel::BandSegement::ApplyGradientThis(double score_normalization) {}
+
+std::string HingeModel::BandSegement::GetTooltip() const { return "Band segment"; }
 
 Vector<2, false> HingeModel::BandSegement::GetPosition() const { return position_; }
 
@@ -246,8 +271,8 @@ HingeModel::Segment::Segment(HingeModel *model, bool solid, SDL2pp::Color vis_co
 
 void HingeModel::Segment::VisualiseThis(std::vector<Visualisation::Object> &objects) const
 {
-    auto o =
-        Visualisation::Object({this->GetPosition(), next_->GetPosition()}, vis_color_);
+    auto o = Visualisation::Object(this->GetPosition(), next_->GetPosition(), this,
+                                   vis_color_);
 
     objects.push_back(o);
 }

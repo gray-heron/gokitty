@@ -5,7 +5,6 @@ void ModelElement::AddChild(ModelElement *child) { children_.push_back(child); }
 void ModelElement::ComputeScore(adept::aReal &score)
 {
     ComputeScoreThis(score);
-
     for (auto child : children_)
     {
         child->ComputeScore(score);
@@ -27,5 +26,14 @@ void ModelElement::ApplyGradient(double score_normalization)
     for (auto child : children_)
     {
         child->ApplyGradient(score_normalization);
+    }
+}
+
+void ModelElement::SetupEquations()
+{
+    SetupEquationsThis();
+    for (auto child : children_)
+    {
+        child->SetupEquations();
     }
 }
