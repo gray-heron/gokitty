@@ -11,11 +11,11 @@
     <bound_factor type="float">6.4</bound_factor>
     <band_separation type="float">15.5f</band_separation>
 
-    <max_centrifugal_force type="float">100.0</max_centrifugal_force>
-    <max_acceleration type="float">0.3</max_acceleration>
+    <max_centrifugal_force type="float">30.0</max_centrifugal_force>
+    <max_acceleration type="float">2.3</max_acceleration>
     <acceleration type="float">10.0</acceleration>
 
-    <alpha type="float">0.005</alpha>
+    <alpha type="float">0.001</alpha>
 
     <track type="string">data/tracks/street.xml</track>
 </configuration>

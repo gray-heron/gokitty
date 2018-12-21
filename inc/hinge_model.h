@@ -70,6 +70,7 @@ class HingeModel : public ModelElement
         Vector<2, false> crossposition_vector_;
 
         adept::aReal speed_;
+        mutable double last_centrifugal_force_;
 
       public:
         Hinge(HingeModel *model, Vector<2, false> position);

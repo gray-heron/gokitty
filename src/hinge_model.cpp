@@ -71,15 +71,17 @@ double HingeModel::Optimize(adept::Stack &stack)
 
     score.set_gradient(1.0); // could use this for score_normalization
     stack.reverse();
-    ApplyGradient(score_normalization);
+    // ApplyGradient(score_normalization);
+    ApplyGradient(1.0);
 
     log_.Info() << "Optimization step done, score = " << score.value()
                 << ", normalization = " << score_normalization;
 
     if (first_last_score_)
-        first_last_score_ = {first_last_score_->first, score.value()};
+        first_last_score_ =
+            std::pair<double, double>(first_last_score_->first, (double)score.value());
     else
-        first_last_score_ = {score.value(), score.value()};
+        first_last_score_ = std::pair<double, double>(score.value(), score.value());
 
     return score.value();
 }
@@ -168,6 +170,8 @@ void HingeModel::Hinge::ComputeScoreThis(adept::aReal &score) const
                          adept::norm2(position_diff_n) -
                      model_->max_acceleration_);
 
+    last_centrifugal_force_ = centrifugal_force.value();
+
     score += len / speed_;
 }
 
@@ -225,6 +229,7 @@ std::string HingeModel::Hinge::GetTooltip() const
     std::stringstream ret;
     ret << "Hinge | position = " << position_;
     ret << ", speed = " << speed_;
+    ret << ", centrifugal_force = " << last_centrifugal_force_;
 
     return ret.str();
 }
