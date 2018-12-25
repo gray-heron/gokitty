@@ -36,7 +36,7 @@ int main(int argc, char **argv)
     Visualisation vis;
     DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
 
-    bool optimization_paused = false;
+    bool optimization_paused = true;
     bool exit_requested = false;
 
     while (!exit_requested)
@@ -47,6 +47,8 @@ int main(int argc, char **argv)
 
         if (!optimization_paused)
             model.Optimize(main_stack);
+        else
+            main_stack.new_recording();
 
         while (auto action = vis.DequeueAction())
         {
