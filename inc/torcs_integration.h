@@ -2,6 +2,7 @@
 #pragma once
 
 #include "integration.h"
+#include "log.h"
 
 class TorcsGearbox
 {
@@ -15,9 +16,9 @@ class TorcsGearbox
 class TorcsIntegration : public SimIntegration
 {
     using udp = boost::asio::ip::udp;
-    udp::endpoint server_endpoint;
-    boost::asio::io_service io_service;
-    std::unique_ptr<udp::socket> socket;
+    udp::endpoint server_endpoint_;
+    boost::asio::io_service io_service_;
+    udp::socket socket_;
 
     CarState ParseCarState(std::string in);
     std::string ParseString(char **cursor);
@@ -25,9 +26,12 @@ class TorcsIntegration : public SimIntegration
     void Send(std::string msg);
     std::string Receive();
 
+    Log log_{"TorcsIntegration"};
+
   public:
-    virtual CarState Cycle(const CarSteers &) override;
-    virtual CarState Begin() override;
+    CarState Begin() override;
+    CarState Cycle(const CarSteers &) override;
 
     TorcsIntegration();
+    ~TorcsIntegration();
 };

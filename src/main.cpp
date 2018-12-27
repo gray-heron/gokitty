@@ -2,7 +2,9 @@
 
 #include "config.h"
 #include "data_reader.h"
+#include "executor.h"
 #include "hinge_model.h"
+#include "integration.h"
 #include "log.h"
 #include "visualisation.h"
 
@@ -41,6 +43,18 @@ int main(int argc, char **argv)
     std::unique_ptr<Visualisation> vis;
     if (Config::inst().GetOption<bool>("gui"))
         vis = std::make_unique<Visualisation>();
+
+    TorcsIntegration integration;
+    ExecutorRecording executor;
+
+    auto state = integration.Begin();
+    while (true)
+    {
+        auto steers = executor.Cycle(state, 1.0);
+        state = integration.Cycle(steers);
+        log.Info() << "Crossposition: " << state.cross_position
+                   << " F: " << state.sensors[9];
+    }
 
     while (!exit_requested)
     {

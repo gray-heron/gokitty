@@ -1,4 +1,7 @@
 <configuration>
+    <host type="string">127.0.0.1</host>
+    <port type="int">3001</port>
+
     <log_file type="string">gokitty.log</log_file>
     <verbose type="bool">true</verbose>
     <gui type="bool">true</gui>
@@ -19,4 +22,34 @@
     <alpha type="float">0.001</alpha>
 
     <track type="string">data/tracks/street.xml</track>
+
+    <distance_sensor-9 type="int">-90</distance_sensor-9>
+    <distance_sensor-8 type="int">-75</distance_sensor-8>
+    <distance_sensor-7 type="int">-60</distance_sensor-7>
+    <distance_sensor-6 type="int">-45</distance_sensor-6>
+    <distance_sensor-5 type="int">-30</distance_sensor-5>
+    <distance_sensor-4 type="int">-20</distance_sensor-4>
+    <distance_sensor-3 type="int">-15</distance_sensor-3>
+    <distance_sensor-2 type="int">-10</distance_sensor-2>
+    <distance_sensor-1 type="int">-5</distance_sensor-1>
+    <distance_sensor0 type="int">0</distance_sensor0>
+    <distance_sensor9 type="int">90</distance_sensor9>
+    <distance_sensor8 type="int">75</distance_sensor8>
+    <distance_sensor7 type="int">60</distance_sensor7>
+    <distance_sensor6 type="int">45</distance_sensor6>
+    <distance_sensor5 type="int">30</distance_sensor5>
+    <distance_sensor4 type="int">20</distance_sensor4>
+    <distance_sensor3 type="int">15</distance_sensor3>
+    <distance_sensor2 type="int">10</distance_sensor2>
+    <distance_sensor1 type="int">5</distance_sensor1>
+
+    <driver_speed_p type="float">0.1</driver_speed_p>
+    <driver_speed_i type="float">0.00003</driver_speed_i>
+    <driver_speed_d type="float">0.0</driver_speed_d>
+
+    <driver_cross_p type="float">1.10</driver_cross_p>
+    <driver_cross_i type="float">0.025</driver_cross_i>
+    <driver_cross_d type="float">80.0</driver_cross_d>
+
+    <recording_speed type="float">150</recording_speed>
 </configuration>

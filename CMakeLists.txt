@@ -29,6 +29,7 @@ include_directories(${CMAKE_BINARY_DIR}/dependencies/include)
 # dependencies
 # ==============================================================================
 
+find_package(Threads)
 find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -82,6 +83,7 @@ set(SRCS_NOMAIN
   src/executor_racing.cpp
   src/executor_recording.cpp
   src/torcs_integration.cpp
+  src/pid_controller.cpp
 
   inc/visualisation.h
   inc/model_element.h
@@ -93,12 +95,13 @@ set(SRCS_NOMAIN
   inc/data_reader.h
   inc/executor.h
   inc/integration.h
+  inc/pid_controller.h
   )
 
 add_library (${APP_NAME} STATIC ${SRCS_NOMAIN})
 
 target_link_libraries(${APP_NAME}
-  ${Boost_LIBRARIES} pugixml SDL2pp ${SDL2_LIBRARIES} adept resources
+  ${Boost_LIBRARIES} pugixml SDL2pp ${SDL2_LIBRARIES} adept resources ${CMAKE_THREAD_LIBS_INIT}
 )
 
 add_executable(demo_app src/main.cpp)
