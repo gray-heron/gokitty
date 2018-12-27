@@ -33,35 +33,49 @@ int main(int argc, char **argv)
 
     adept::Stack main_stack;
     HingeModel model(100, 100, 10.0f);
-    Visualisation vis;
     DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
 
-    bool optimization_paused = true;
+    bool optimization_paused = false;
     bool exit_requested = false;
+
+    std::unique_ptr<Visualisation> vis;
+    if (Config::inst().GetOption<bool>("gui"))
+        vis = std::make_unique<Visualisation>();
 
     while (!exit_requested)
     {
-        std::vector<Visualisation::Object> objects;
-        model.Visualise(objects);
-        vis.Tick(objects);
+        if (vis)
+        {
+            std::vector<Visualisation::Object> objects;
+            model.Visualise(objects);
+            vis->Tick(objects);
+        }
 
         if (!optimization_paused)
-            model.Optimize(main_stack);
-        else
-            main_stack.new_recording();
-
-        while (auto action = vis.DequeueAction())
         {
-            switch (*action)
+            if (model.Optimize(main_stack) < 250.0)
+                return 0;
+        }
+        else
+        {
+            main_stack.new_recording();
+        }
+
+        if (vis)
+        {
+            while (auto action = vis->DequeueAction())
             {
-            case Visualisation::Exit:
-                exit_requested = true;
-                break;
-            case Visualisation::OptimizationPause:
-                optimization_paused = !optimization_paused;
-                break;
-            default:
-                ASSERT(0, "Action not implemented!")
+                switch (*action)
+                {
+                case Visualisation::Exit:
+                    exit_requested = true;
+                    break;
+                case Visualisation::OptimizationPause:
+                    optimization_paused = !optimization_paused;
+                    break;
+                default:
+                    ASSERT(0, "Action not implemented!")
+                }
             }
         }
     }

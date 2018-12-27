@@ -79,6 +79,9 @@ set(SRCS_NOMAIN
   src/hinge_model.cpp
   src/util.cpp
   src/data_reader.cpp
+  src/executor_racing.cpp
+  src/executor_recording.cpp
+  src/torcs_integration.cpp
 
   inc/visualisation.h
   inc/model_element.h
@@ -87,7 +90,10 @@ set(SRCS_NOMAIN
   inc/log.h
   inc/hinge_model.h
   inc/util.h
-  inc/data_reader.h)
+  inc/data_reader.h
+  inc/executor.h
+  inc/integration.h
+  )
 
 add_library (${APP_NAME} STATIC ${SRCS_NOMAIN})
 

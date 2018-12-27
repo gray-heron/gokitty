@@ -1,6 +1,7 @@
 <configuration>
     <log_file type="string">gokitty.log</log_file>
     <verbose type="bool">true</verbose>
+    <gui type="bool">true</gui>
     <config type="string"></config>
 
     <resx type="int">1600</resx>
@@ -9,7 +10,7 @@
     <angle_factor type="float">0.1965</angle_factor>
     <forward_factor type="float">0.4</forward_factor>
     <bound_factor type="float">6.4</bound_factor>
-    <band_separation type="float">15.5f</band_separation>
+    <band_separation type="float">15.0f</band_separation>
 
     <max_centrifugal_force type="float">30.0</max_centrifugal_force>
     <max_acceleration type="float">2.3</max_acceleration>
