@@ -47,9 +47,9 @@
     <driver_speed_i type="float">0.00003</driver_speed_i>
     <driver_speed_d type="float">0.0</driver_speed_d>
 
-    <driver_cross_p type="float">1.10</driver_cross_p>
-    <driver_cross_i type="float">0.025</driver_cross_i>
-    <driver_cross_d type="float">80.0</driver_cross_d>
+    <driver_cross_p type="float">2.05</driver_cross_p>
+    <driver_cross_i type="float">0.004</driver_cross_i>
+    <driver_cross_d type="float">40.0</driver_cross_d>
 
     <recording_speed type="float">150</recording_speed>
 </configuration>

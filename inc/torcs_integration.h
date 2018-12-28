@@ -9,6 +9,8 @@ class TorcsGearbox
     int gear_dir_;
     float last_rpm_;
 
+    Log log_{"Gearbox"};
+
   public:
     void SetClutchAndGear(const CarState &state, CarSteers &steers);
 };

@@ -11,6 +11,7 @@ ExecutorRecording::ExecutorRecording()
                                 Config::inst().GetOption<float>("driver_cross_d"), -1.0,
                                 1.0)
 {
+    log_.Info() << "Created recording executor.";
 }
 
 CarSteers ExecutorRecording::Cycle(const CarState &state, double dt)

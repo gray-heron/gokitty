@@ -16,6 +16,8 @@ class ExecutorRecording : public Executor
     PidController speed_controller_;
     PidController crossposition_controller_;
 
+    Log log_{"ExecutorRecording"};
+
   public:
     ExecutorRecording();
     CarSteers Cycle(const CarState &state, double dt) override;
@@ -25,6 +27,8 @@ class ExecutorRacing : public Executor
 {
     const HingeModel &model_;
     TorcsGearbox gearbox_operator_;
+
+    Log log_{"ExecutorRacing"};
 
   public:
     ExecutorRacing(const HingeModel &model_);

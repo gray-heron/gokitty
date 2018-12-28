@@ -32,11 +32,13 @@ void TorcsGearbox::SetClutchAndGear(const CarState &state, CarSteers &steers)
     {
         steers.clutch = steers.gear > 0 ? 0.5f : 1.0f;
         gear_dir_ = 1;
+        log_.Info() << "Gear up.";
     }
     else if (state.rpm < 5000.0f && last_rpm_ >= 5000.0f)
     {
         steers.clutch = 0.5f;
         gear_dir_ = -1;
+        log_.Info() << "Gear down.";
     }
 
     if (steers.clutch > 0.4f)
