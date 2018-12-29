@@ -34,11 +34,6 @@ int main(int argc, char **argv)
     //====================
 
     adept::Stack main_stack;
-    HingeModel model(100, 100, 10.0f);
-    DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
-
-    bool optimization_paused = false;
-    bool exit_requested = false;
 
     std::unique_ptr<Visualisation> vis;
     if (Config::inst().GetOption<bool>("gui"))
@@ -48,49 +43,62 @@ int main(int argc, char **argv)
     ExecutorRecording executor;
 
     auto state = integration.Begin();
-    while (true)
+    while (!executor.RecordingDone())
     {
         auto steers = executor.Cycle(state, 1.0);
         state = integration.Cycle(steers);
-        log.Info() << "Crossposition: " << state.cross_position
-                   << " F: " << state.sensors[9];
-    }
-
-    while (!exit_requested)
-    {
         if (vis)
         {
             std::vector<Visualisation::Object> objects;
-            model.Visualise(objects);
+            executor.Visualise(objects);
             vis->Tick(objects);
         }
+    }
 
-        if (!optimization_paused)
-        {
-            if (model.Optimize(main_stack) < 250.0)
-                return 0;
-        }
-        else
-        {
-            main_stack.new_recording();
-        }
+    log.Info() << "Nothing more to do.";
+    /*
+        HingeModel model(100, 100, 10.0f);
+        DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
 
-        if (vis)
+        bool optimization_paused = false;
+        bool exit_requested = false;
+
+        while (!exit_requested)
         {
-            while (auto action = vis->DequeueAction())
+            if (vis)
             {
-                switch (*action)
+                std::vector<Visualisation::Object> objects;
+                model.Visualise(objects);
+                vis->Tick(objects);
+            }
+
+            if (!optimization_paused)
+            {
+                if (model.Optimize(main_stack) < 250.0)
+                    return 0;
+            }
+            else
+            {
+                main_stack.new_recording();
+            }
+
+            if (vis)
+            {
+                while (auto action = vis->DequeueAction())
                 {
-                case Visualisation::Exit:
-                    exit_requested = true;
-                    break;
-                case Visualisation::OptimizationPause:
-                    optimization_paused = !optimization_paused;
-                    break;
-                default:
-                    ASSERT(0, "Action not implemented!")
+                    switch (*action)
+                    {
+                    case Visualisation::Exit:
+                        exit_requested = true;
+                        break;
+                    case Visualisation::OptimizationPause:
+                        optimization_paused = !optimization_paused;
+                        break;
+                    default:
+                        ASSERT(0, "Action not implemented!")
+                    }
                 }
             }
         }
-    }
+        */
 }

@@ -30,6 +30,14 @@ void Visualisation::Tick(const std::vector<Object> &objects)
 {
     renderer_.SetDrawColor(SDL2pp::Color(0, 0, 0)).Clear();
 
+    renderer_.SetDrawColor(SDL2pp::Color(255, 255, 0));
+
+    renderer_.DrawLine(TensorToPoint(Projection(Vector<2, false>({{-100, 0}}))),
+                       TensorToPoint(Projection(Vector<2, false>({{100, 0}}))));
+
+    renderer_.DrawLine(TensorToPoint(Projection(Vector<2, false>({{0, -100}}))),
+                       TensorToPoint(Projection(Vector<2, false>({{0, 100}}))));
+
     for (const auto &obj : objects)
     {
         renderer_.SetDrawColor(get<3>(obj));
@@ -97,6 +105,9 @@ void Visualisation::HandleMouseKeyDown(SDL_MouseButtonEvent key,
 
     for (const auto &obj : objects)
     {
+        if (!get<2>(obj))
+            continue;
+
         adept::Real dist =
             adept::norm2(Vector<2, false>({{key.x, key.y}}) - Projection(get<0>(obj)));
 

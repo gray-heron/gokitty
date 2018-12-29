@@ -5,7 +5,7 @@
     <log_file type="string">gokitty.log</log_file>
     <verbose type="bool">true</verbose>
     <gui type="bool">true</gui>
-    <config type="string"></config>
+    <config type="string">settings.xml</config>
 
     <resx type="int">1600</resx>
     <resy type="int">1440</resy>
@@ -21,7 +21,7 @@
 
     <alpha type="float">0.001</alpha>
 
-    <track type="string">data/tracks/street.xml</track>
+    <track type="string">data/tracks/testsave.xml</track>
 
     <distance_sensor-9 type="int">-90</distance_sensor-9>
     <distance_sensor-8 type="int">-75</distance_sensor-8>
@@ -42,6 +42,9 @@
     <distance_sensor3 type="int">15</distance_sensor3>
     <distance_sensor2 type="int">10</distance_sensor2>
     <distance_sensor1 type="int">5</distance_sensor1>
+    <sensor_left type="int">0</sensor_left>
+    <sensor_right type="int">18</sensor_right>
+    <sensor_front type="int">9</sensor_front>
 
     <driver_speed_p type="float">0.1</driver_speed_p>
     <driver_speed_i type="float">0.00003</driver_speed_i>

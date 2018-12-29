@@ -7,6 +7,9 @@
 #include "exceptions.h"
 #include "util.h"
 
+using namespace pugi;
+using std::to_string;
+
 void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
 {
     Log log{"DataReader"};
@@ -95,4 +98,52 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
     last_hinge->LinkForward(first_hinge);
 
     log.Info() << "Track reading done. " << hinges_n << " hinges produced.";
+}
+
+TrackSaver::TrackSaver(std::string track_name)
+    : last_f_(0.0), track_name_(track_name), heading_(0.0), x_(0.0), y_(0.0)
+{
+    root_node_ = doc_.append_child("track");
+}
+
+void TrackSaver::MarkWaypoint(float f, float l, float r, float angle, float speed)
+{
+    auto w = root_node_.append_child("waypoint");
+    w.append_child("forward")
+        .append_child(pugi::node_pcdata)
+        .set_value(to_string(f - last_f_).c_str());
+    w.append_child("left").append_child(node_pcdata).set_value(to_string(l).c_str());
+    w.append_child("right").append_child(node_pcdata).set_value(to_string(r).c_str());
+    w.append_child("angle").append_child(node_pcdata).set_value(to_string(angle).c_str());
+
+    const auto angle_factor = Config::inst().GetOption<float>("angle_factor");
+    const auto forward_factor = Config::inst().GetOption<float>("forward_factor");
+
+    x_ += std::cos(heading_) * forward_factor * f;
+    y_ += std::sin(heading_) * forward_factor * f;
+
+    if (waypoint_sep_++ % 120 == 0)
+    {
+        auto v2 = Vector<2, false>({{x_, y_}});
+
+        objects_.push_back(
+            Visualisation::Object(v1_, v2, nullptr, SDL2pp::Color(255, 255, 255)));
+
+        v1_ = v2;
+    }
+
+    heading_ += angle * angle_factor;
+
+    last_f_ = f;
+}
+
+void TrackSaver::Visualise(std::vector<Visualisation::Object> &objects) const
+{
+    std::copy(objects_.begin(), objects_.end(), std::back_inserter(objects));
+}
+
+TrackSaver::~TrackSaver()
+{
+    doc_.save_file(track_name_.c_str());
+    Log("TrackSaver").Info() << "Track saved to: " << track_name_;
 }
