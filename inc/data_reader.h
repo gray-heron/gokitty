@@ -14,7 +14,6 @@ class DataReader
 
 class TrackSaver
 {
-    double last_f_;
     pugi::xml_document doc_;
     pugi::xml_node root_node_;
     const std::string track_name_;

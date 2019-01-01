@@ -24,7 +24,7 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
     const auto forward_factor = Config::inst().GetOption<float>("forward_factor");
     const auto band_separation = Config::inst().GetOption<float>("band_separation");
 
-    float x = 0, y = 0;
+    float x = 1000, y = 1000;
     float heading = M_PI_2 / 2.0f;
     float fuse = 0.0f;
     int hinges_n = 0;
@@ -36,10 +36,10 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
 
     for (auto child : doc.root().child("track").children())
     {
-        float forward = boost::any_cast<float>(
-            ParseValue(typeid(float), child.child("forward").text().as_string()));
-        float angle = boost::any_cast<float>(
-            ParseValue(typeid(float), child.child("angle").text().as_string()));
+        float forward = child.child("forward").text().as_float();
+        float angle = child.child("angle").text().as_float();
+        float left = child.child("left").text().as_float();
+        float right = child.child("right").text().as_float();
 
         x += std::cos(heading) * forward_factor * forward;
         y += std::sin(heading) * forward_factor * forward;
@@ -49,23 +49,19 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
         {
             ASSERT((std::string)child.name() == "waypoint");
 
-            float lx =
-                x + std::cos(heading + M_PI / 2.0f) * /*waypoint.l * */ bound_factor;
-            float ly =
-                y + std::sin(heading + M_PI / 2.0f) * /*waypoint.l * */ bound_factor;
+            float lx = x + std::cos(heading + M_PI / 2.0f) * left * bound_factor;
+            float ly = y + std::sin(heading + M_PI / 2.0f) * left * bound_factor;
 
-            float rx =
-                x + std::cos(heading - M_PI / 2.0f) * /*waypoint.r * */ bound_factor;
-            float ry =
-                y + std::sin(heading - M_PI / 2.0f) * /*waypoint.r * */ bound_factor;
+            float rx = x + std::cos(heading - M_PI / 2.0f) * right * bound_factor;
+            float ry = y + std::sin(heading - M_PI / 2.0f) * right * bound_factor;
 
-            auto left_band = new HingeModel::BandSegement(
-                &model, Vector<2, false>({{lx, ly}}) + 500.0f);
-            auto right_band = new HingeModel::BandSegement(
-                &model, Vector<2, false>({{rx, ry}}) + 500.0f);
+            auto left_band =
+                new HingeModel::BandSegement(&model, Vector<2, false>({{lx, ly}}));
+            auto right_band =
+                new HingeModel::BandSegement(&model, Vector<2, false>({{rx, ry}}));
             auto hinge = new HingeModel::Hinge(
-                &model,
-                Vector<2, false>({{(rx + lx) / 2.0f, (ry + ly) / 2.0f}}) + 500.0f);
+                &model, Vector<2, false>({{(rx + lx) / 2.0f, (ry + ly) / 2.0f}}),
+                (left + right) / 2.0);
 
             if (!first_left_band && !first_right_band)
             {
@@ -93,15 +89,15 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
         }
     }
 
-    last_left_band->LinkForward(first_left_band);
-    last_right_band->LinkForward(first_right_band);
-    last_hinge->LinkForward(first_hinge);
+    // last_left_band->LinkForward(first_left_band);
+    // last_right_band->LinkForward(first_right_band);
+    // last_hinge->LinkForward(first_hinge);
 
     log.Info() << "Track reading done. " << hinges_n << " hinges produced.";
 }
 
 TrackSaver::TrackSaver(std::string track_name)
-    : last_f_(0.0), track_name_(track_name), heading_(0.0), x_(0.0), y_(0.0)
+    : track_name_(track_name), heading_(0.0), x_(0.0), y_(0.0)
 {
     root_node_ = doc_.append_child("track");
 }
@@ -111,7 +107,7 @@ void TrackSaver::MarkWaypoint(float f, float l, float r, float angle, float spee
     auto w = root_node_.append_child("waypoint");
     w.append_child("forward")
         .append_child(pugi::node_pcdata)
-        .set_value(to_string(f - last_f_).c_str());
+        .set_value(to_string(f).c_str());
     w.append_child("left").append_child(node_pcdata).set_value(to_string(l).c_str());
     w.append_child("right").append_child(node_pcdata).set_value(to_string(r).c_str());
     w.append_child("angle").append_child(node_pcdata).set_value(to_string(angle).c_str());
@@ -133,8 +129,6 @@ void TrackSaver::MarkWaypoint(float f, float l, float r, float angle, float spee
     }
 
     heading_ += angle * angle_factor;
-
-    last_f_ = f;
 }
 
 void TrackSaver::Visualise(std::vector<Visualisation::Object> &objects) const

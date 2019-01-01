@@ -1,4 +1,5 @@
 <configuration>
+    <stage>1</stage>
     <gui>true</gui>
-    <angle_factor>0.01</angle_factor>
+    <angle_factor>0.00403</angle_factor>
 </configuration>

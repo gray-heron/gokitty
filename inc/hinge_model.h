@@ -71,9 +71,10 @@ class HingeModel : public ModelElement
 
         adept::aReal speed_;
         mutable double last_centrifugal_force_;
+        const double width_;
 
       public:
-        Hinge(HingeModel *model, Vector<2, false> position);
+        Hinge(HingeModel *model, Vector<2, false> position, double width);
         void LinkForward(Segment *next) override;
         Vector<2, false> GetPosition() const override;
     };

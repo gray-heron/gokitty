@@ -10,6 +10,9 @@
 
 using std::string;
 
+#define STAGE_RECORD 0
+#define STAGE_RACE 1
+
 int main(int argc, char **argv)
 {
     Log log("main");
@@ -39,25 +42,29 @@ int main(int argc, char **argv)
     if (Config::inst().GetOption<bool>("gui"))
         vis = std::make_unique<Visualisation>();
 
-    TorcsIntegration integration;
-    ExecutorRecording executor;
-
-    auto state = integration.Begin();
-    while (!executor.RecordingDone())
+    if (Config::inst().GetOption<int>("stage") == STAGE_RECORD)
     {
-        auto steers = executor.Cycle(state, 1.0);
-        state = integration.Cycle(steers);
-        if (vis)
+        TorcsIntegration integration;
+        ExecutorRecording executor;
+
+        auto state = integration.Begin();
+        while (!executor.RecordingDone())
         {
-            std::vector<Visualisation::Object> objects;
-            executor.Visualise(objects);
-            vis->Tick(objects);
+            auto steers = executor.Cycle(state, 1.0);
+            state = integration.Cycle(steers);
+
+            if (vis)
+            {
+                std::vector<Visualisation::Object> objects;
+                executor.Visualise(objects);
+                vis->Tick(objects);
+            }
         }
     }
 
-    log.Info() << "Nothing more to do.";
-    /*
-        HingeModel model(100, 100, 10.0f);
+    if (Config::inst().GetOption<int>("stage") == STAGE_RACE)
+    {
+        HingeModel model(200, 200, 10.0f);
         DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
 
         bool optimization_paused = false;
@@ -74,8 +81,7 @@ int main(int argc, char **argv)
 
             if (!optimization_paused)
             {
-                if (model.Optimize(main_stack) < 250.0)
-                    return 0;
+                model.Optimize(main_stack);
             }
             else
             {
@@ -100,5 +106,7 @@ int main(int argc, char **argv)
                 }
             }
         }
-        */
+    }
+
+    log.Info() << "Nothing more to do.";
 }

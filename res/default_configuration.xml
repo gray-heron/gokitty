@@ -2,6 +2,8 @@
     <host type="string">127.0.0.1</host>
     <port type="int">3001</port>
 
+    <stage type="int">1</stage>
+
     <log_file type="string">gokitty.log</log_file>
     <verbose type="bool">true</verbose>
     <gui type="bool">true</gui>
@@ -10,16 +12,16 @@
     <resx type="int">1600</resx>
     <resy type="int">1440</resy>
 
-    <angle_factor type="float">0.1965</angle_factor>
-    <forward_factor type="float">0.4</forward_factor>
-    <bound_factor type="float">6.4</bound_factor>
+    <angle_factor type="float">0.0265</angle_factor>
+    <forward_factor type="float">1.0</forward_factor>
+    <bound_factor type="float">1</bound_factor>
     <band_separation type="float">15.0f</band_separation>
 
     <max_centrifugal_force type="float">30.0</max_centrifugal_force>
     <max_acceleration type="float">2.3</max_acceleration>
     <acceleration type="float">10.0</acceleration>
 
-    <alpha type="float">0.001</alpha>
+    <alpha type="float">0.01</alpha>
 
     <track type="string">data/tracks/testsave.xml</track>
 
@@ -54,5 +56,5 @@
     <driver_cross_i type="float">0.004</driver_cross_i>
     <driver_cross_d type="float">40.0</driver_cross_d>
 
-    <recording_speed type="float">150</recording_speed>
+    <recording_speed type="float">120</recording_speed>
 </configuration>
