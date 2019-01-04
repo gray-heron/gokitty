@@ -41,7 +41,7 @@ class Visualisation
     SDL2pp::Renderer renderer_;
 
     float zoom_;
-    Vector<2, false> windows_offset_;
+    const Vector<2, false> windows_offset_;
     Vector<2, false> camera_pos_;
 
     std::queue<Action> action_queue_;
@@ -50,6 +50,7 @@ class Visualisation
 
   public:
     Visualisation();
+    void SetCameraPos(Vector<2, false> camera_center);
 
     boost::optional<Visualisation::Action> DequeueAction();
     void Tick(const std::vector<Object> &objects);

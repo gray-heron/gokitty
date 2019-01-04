@@ -305,8 +305,21 @@ void HingeModel::Segment::LinkForward(HingeModel::Segment *next)
     if (solid_)
     {
         auto collison_zone_coords = model_->CoordinatesToCollisionZone(GetPosition());
-        model_->collision_zones_[collison_zone_coords.first][collison_zone_coords.second]
-            ->RegisterSegment(this);
+
+        if (collison_zone_coords.first >= model_->width_ ||
+            collison_zone_coords.second >= model_->height_ ||
+            collison_zone_coords.first < 0 || collison_zone_coords.second < 0)
+        {
+            model_->log_.Error() << "Track doesn't fit in the board";
+            throw std::runtime_error("");
+        }
+        else
+        {
+            model_
+                ->collision_zones_[collison_zone_coords.first]
+                                  [collison_zone_coords.second]
+                ->RegisterSegment(this);
+        }
     }
 }
 

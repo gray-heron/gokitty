@@ -10,7 +10,8 @@
 using namespace pugi;
 using std::to_string;
 
-void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
+void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model,
+                                Vector<2, false> startpoint)
 {
     Log log{"DataReader"};
     log.Info() << "Begin track reading.";
@@ -24,7 +25,7 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model)
     const auto forward_factor = Config::inst().GetOption<float>("forward_factor");
     const auto band_separation = Config::inst().GetOption<float>("band_separation");
 
-    float x = 1000, y = 1000;
+    float x = startpoint(0, 0), y = startpoint(0, 1);
     float heading = M_PI_2 / 2.0f;
     float fuse = 0.0f;
     int hinges_n = 0;

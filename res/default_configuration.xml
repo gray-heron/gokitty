@@ -25,6 +25,10 @@
 
     <track type="string">data/tracks/testsave.xml</track>
 
+    <board_width type="int">10</board_width>
+    <board_height type="int">10</board_height>
+    <board_cell type="float">1000</board_cell>
+
     <distance_sensor-9 type="int">-90</distance_sensor-9>
     <distance_sensor-8 type="int">-75</distance_sensor-8>
     <distance_sensor-7 type="int">-60</distance_sensor-7>

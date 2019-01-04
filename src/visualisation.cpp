@@ -26,6 +26,11 @@ Vector<2, false> Visualisation::Projection(Vector<2, false> pos)
 
 Point Visualisation::TensorToPoint(Vector<2, false> t) { return Point(t(0, 0), t(0, 1)); }
 
+void Visualisation::SetCameraPos(Vector<2, false> camera_center)
+{
+    camera_pos_ = -windows_offset_ - camera_center;
+}
+
 void Visualisation::Tick(const std::vector<Object> &objects)
 {
     renderer_.SetDrawColor(SDL2pp::Color(0, 0, 0)).Clear();

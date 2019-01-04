@@ -64,8 +64,18 @@ int main(int argc, char **argv)
 
     if (Config::inst().GetOption<int>("stage") == STAGE_RACE)
     {
-        HingeModel model(200, 200, 10.0f);
-        DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model);
+        int model_size_x = Config::inst().GetOption<int>("board_width");
+        int model_size_y = Config::inst().GetOption<int>("board_height");
+        double model_cell = Config::inst().GetOption<float>("board_cell");
+
+        auto track_start = Vector<2, false>({{double(model_size_x) * model_cell / 2.0,
+                                              double(model_size_y) * model_cell / 2.0}});
+
+        HingeModel model(model_size_x, model_size_y, model_cell);
+        DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model,
+                                   track_start);
+
+        vis->SetCameraPos(track_start);
 
         bool optimization_paused = false;
         bool exit_requested = false;

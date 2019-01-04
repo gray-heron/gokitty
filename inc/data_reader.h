@@ -9,7 +9,8 @@
 class DataReader
 {
   public:
-    static void ReadTORCSTrack(std::string xml_path, HingeModel &model);
+    static void ReadTORCSTrack(std::string xml_path, HingeModel &model,
+                               Vector<2, false> startpoint);
 };
 
 class TrackSaver

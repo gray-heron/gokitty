@@ -36,11 +36,14 @@ class ExecutorRecording : public Executor
 class ExecutorRacing : public Executor
 {
     const HingeModel &model_;
-    TorcsGearbox gearbox_operator_;
+    TorcsGearbox gearbox_controller_;
+    PidController speed_controller_;
+    PidController crossposition_controller_;
 
     Log log_{"ExecutorRacing"};
 
   public:
-    ExecutorRacing(const HingeModel &model_);
+    ExecutorRacing(const HingeModel &model);
     CarSteers Cycle(const CarState &state, double dt) override;
+    void Visualise(std::vector<Visualisation::Object> &objects) const;
 };
