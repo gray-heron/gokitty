@@ -1,5 +1,8 @@
 <configuration>
-    <stage>1</stage>
-    <gui>true</gui>
-    <angle_factor>0.00403</angle_factor>
+    <racing_speed type="float">290</racing_speed>
+    <score_threshold type="float">600</score_threshold>
+
+    <driver_cross_p type="float">1.05</driver_cross_p>
+    <driver_cross_i type="float">0.002</driver_cross_i>
+    <driver_cross_d type="float">20.0</driver_cross_d>
 </configuration>

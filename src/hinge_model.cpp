@@ -86,6 +86,8 @@ double HingeModel::Optimize(adept::Stack &stack)
     return score.value();
 }
 
+HingeModel::Hinge *HingeModel::GetFirstHinge() const { return first_hinge_; }
+
 // ================ COLLISION_ZONE ================
 
 HingeModel::HingeCollisionZone::HingeCollisionZone(HingeModel *model,
@@ -137,10 +139,11 @@ void HingeModel::HingeCollisionZone::RegisterSegment(HingeModel::Segment *segmen
 
 // ================ HINGE ================
 
-HingeModel::Hinge::Hinge(HingeModel *model, Vector<2, false> position, double width)
+HingeModel::Hinge::Hinge(HingeModel *model, Vector<2, false> position, double width,
+                         double forward)
     : HingeModel::Segment(model, false, SDL2pp::Color(0, 255, 0)),
       zero_position_(position), position_(position), crossposition_(0.0f), speed_(10.0),
-      width_(width)
+      width_(width), forward_(forward)
 {
     model->AddHinge(this);
 }
@@ -181,7 +184,7 @@ void HingeModel::Hinge::ComputeScoreThis(adept::aReal &score) const
 
 void HingeModel::Hinge::ApplyGradientThis(double score_normalization)
 {
-    speed_ -= speed_.get_gradient() * model_->alpha_ * score_normalization * 3.0;
+    speed_ -= speed_.get_gradient() * model_->alpha_ * score_normalization * 10.0;
 
     if (next_ && previous_)
     {
@@ -248,6 +251,20 @@ std::string HingeModel::Hinge::GetTooltip() const
 Vector<2, false> HingeModel::Hinge::GetPosition() const
 {
     return Vector<2, true>(position_).inactive_link();
+}
+
+double HingeModel::Hinge::GetCrossposition() const { return crossposition_.value(); }
+
+double HingeModel::Hinge::GetForward() const { return forward_; }
+
+HingeModel::Hinge *HingeModel::Hinge::GetNext() const
+{
+    return static_cast<Hinge *>(next_);
+}
+
+Vector<2, false> HingeModel::Hinge::GetCrosspositionVector() const
+{
+    return crossposition_vector_;
 }
 
 SDL2pp::Color HingeModel::Hinge::SpeedToColor(double speed)

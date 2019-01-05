@@ -28,6 +28,7 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model,
     float x = startpoint(0, 0), y = startpoint(0, 1);
     float heading = M_PI_2 / 2.0f;
     float fuse = 0.0f;
+    float forward_total = 0.0f;
     int hinges_n = 0;
 
     HingeModel::BandSegement *first_left_band = nullptr, *first_right_band = nullptr,
@@ -62,7 +63,7 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model,
                 new HingeModel::BandSegement(&model, Vector<2, false>({{rx, ry}}));
             auto hinge = new HingeModel::Hinge(
                 &model, Vector<2, false>({{(rx + lx) / 2.0f, (ry + ly) / 2.0f}}),
-                (left + right) / 2.0);
+                (left + right) / 2.0, forward_total);
 
             if (!first_left_band && !first_right_band)
             {
@@ -88,6 +89,8 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model,
         {
             fuse += forward;
         }
+
+        forward_total += forward;
     }
 
     // last_left_band->LinkForward(first_left_band);

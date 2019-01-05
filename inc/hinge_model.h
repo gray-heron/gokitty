@@ -72,11 +72,16 @@ class HingeModel : public ModelElement
         adept::aReal speed_;
         mutable double last_centrifugal_force_;
         const double width_;
+        const double forward_;
 
       public:
-        Hinge(HingeModel *model, Vector<2, false> position, double width);
+        Hinge(HingeModel *model, Vector<2, false> position, double width, double forward);
         void LinkForward(Segment *next) override;
         Vector<2, false> GetPosition() const override;
+        double GetCrossposition() const;
+        Vector<2, false> GetCrosspositionVector() const;
+        double GetForward() const;
+        Hinge *GetNext() const;
     };
 
     class BandSegement : public Segment
@@ -116,12 +121,12 @@ class HingeModel : public ModelElement
 
     void AddHinge(Hinge *h);
     void AddBandSegment(BandSegement *bs);
-    void PositionHinge(Hinge *h);
 
     Log log_{"HingeModel"};
 
   public:
     HingeModel(uint32_t width, uint32_t height, float collision_zone_side);
+    Hinge *GetFirstHinge() const;
 
     double Optimize(adept::Stack &stack);
 };

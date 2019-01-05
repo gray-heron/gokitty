@@ -24,7 +24,6 @@ int main(int argc, char **argv)
     if (config_path != "")
     {
         Config::inst().Load(config_path);
-        Config::inst().Load(argc, argv); // override params from config file
     }
 
     LoggingSingleton::inst().SetConsoleVerbosity(
@@ -42,6 +41,84 @@ int main(int argc, char **argv)
     if (Config::inst().GetOption<bool>("gui"))
         vis = std::make_unique<Visualisation>();
 
+    if (Config::inst().GetOption<int>("stage") == STAGE_RACE)
+    {
+        int model_size_x = Config::inst().GetOption<int>("board_width");
+        int model_size_y = Config::inst().GetOption<int>("board_height");
+        double model_cell = Config::inst().GetOption<float>("board_cell");
+        double score = FLT_MAX;
+
+        auto track_start = Vector<2, false>({{double(model_size_x) * model_cell / 2.0,
+                                              double(model_size_y) * model_cell / 2.0}});
+
+        HingeModel model(model_size_x, model_size_y, model_cell);
+        DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model,
+                                   track_start);
+
+        std::unique_ptr<TorcsIntegration> integration;
+        ExecutorRacing executor(model);
+
+        if (vis)
+            vis->SetCameraPos(track_start);
+
+        bool optimization_paused = false;
+        bool exit_requested = false;
+        CarState car_state;
+
+        while (!exit_requested)
+        {
+            if (!optimization_paused)
+            {
+                for (int i = 0;
+                     i < Config::inst().GetOption<int>("optimizations_per_frame"); i++)
+                {
+                    score = model.Optimize(main_stack);
+                }
+            }
+            else
+            {
+                main_stack.new_recording();
+            }
+
+            if (!integration &&
+                score < Config::inst().GetOption<float>("score_threshold"))
+            {
+                integration = std::make_unique<TorcsIntegration>();
+                car_state = integration->Begin();
+            }
+
+            if (integration)
+            {
+                auto steers = executor.Cycle(car_state, 1.0);
+                car_state = integration->Cycle(steers);
+            }
+
+            if (vis)
+            {
+                std::vector<Visualisation::Object> objects;
+
+                model.Visualise(objects);
+                executor.Visualise(objects);
+                vis->Tick(objects);
+
+                while (auto action = vis->DequeueAction())
+                {
+                    switch (*action)
+                    {
+                    case Visualisation::Exit:
+                        exit_requested = true;
+                        break;
+                    case Visualisation::OptimizationPause:
+                        optimization_paused = !optimization_paused;
+                        break;
+                    default:
+                        ASSERT(0, "Action not implemented!")
+                    }
+                }
+            }
+        }
+    }
+
     if (Config::inst().GetOption<int>("stage") == STAGE_RECORD)
     {
         TorcsIntegration integration;
@@ -58,62 +135,6 @@ int main(int argc, char **argv)
                 std::vector<Visualisation::Object> objects;
                 executor.Visualise(objects);
                 vis->Tick(objects);
-            }
-        }
-    }
-
-    if (Config::inst().GetOption<int>("stage") == STAGE_RACE)
-    {
-        int model_size_x = Config::inst().GetOption<int>("board_width");
-        int model_size_y = Config::inst().GetOption<int>("board_height");
-        double model_cell = Config::inst().GetOption<float>("board_cell");
-
-        auto track_start = Vector<2, false>({{double(model_size_x) * model_cell / 2.0,
-                                              double(model_size_y) * model_cell / 2.0}});
-
-        HingeModel model(model_size_x, model_size_y, model_cell);
-        DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model,
-                                   track_start);
-
-        vis->SetCameraPos(track_start);
-
-        bool optimization_paused = false;
-        bool exit_requested = false;
-
-        while (!exit_requested)
-        {
-            if (vis)
-            {
-                std::vector<Visualisation::Object> objects;
-                model.Visualise(objects);
-                vis->Tick(objects);
-            }
-
-            if (!optimization_paused)
-            {
-                model.Optimize(main_stack);
-            }
-            else
-            {
-                main_stack.new_recording();
-            }
-
-            if (vis)
-            {
-                while (auto action = vis->DequeueAction())
-                {
-                    switch (*action)
-                    {
-                    case Visualisation::Exit:
-                        exit_requested = true;
-                        break;
-                    case Visualisation::OptimizationPause:
-                        optimization_paused = !optimization_paused;
-                        break;
-                    default:
-                        ASSERT(0, "Action not implemented!")
-                    }
-                }
             }
         }
     }

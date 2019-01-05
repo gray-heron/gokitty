@@ -40,6 +40,9 @@ class ExecutorRacing : public Executor
     PidController speed_controller_;
     PidController crossposition_controller_;
 
+    HingeModel::Hinge *current_hinge_;
+    double forward_boost_;
+
     Log log_{"ExecutorRacing"};
 
   public:

@@ -6,9 +6,19 @@
 
 #include "log.h"
 
-#define ASSERT(x, ...)                                                                   \
+#define __3RD_ARGUMENT(a1, a2, a3, ...) a3
+
+#define __ASSERT_SWITCH(...) __3RD_ARGUMENT(__VA_ARGS__, __ASSERT2, __ASSERT1)
+
+#define __ASSERT2(x, y)                                                                  \
     if (!(x))                                                                            \
-        throw AssertionFailedException(__FILE__, __LINE__, #__VA_ARGS__);
+        throw AssertionFailedException(__FILE__, __LINE__, y);
+
+#define __ASSERT1(x)                                                                     \
+    if (!(x))                                                                            \
+        throw AssertionFailedException(__FILE__, __LINE__);
+
+#define ASSERT(...) __ASSERT_SWITCH(__VA_ARGS__)(__VA_ARGS__)
 
 class Exception : public std::exception
 {
