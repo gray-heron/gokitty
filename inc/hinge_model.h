@@ -76,12 +76,16 @@ class HingeModel : public ModelElement
 
       public:
         Hinge(HingeModel *model, Vector<2, false> position, double width, double forward);
+
         void LinkForward(Segment *next) override;
         Vector<2, false> GetPosition() const override;
         double GetCrossposition() const;
+        double GetSpeed() const;
         Vector<2, false> GetCrosspositionVector() const;
         double GetForward() const;
         Hinge *GetNext() const;
+        void SetCrossposition(double new_cp);
+        void SetSpeed(double new_cp);
     };
 
     class BandSegement : public Segment

@@ -55,6 +55,10 @@ int main(int argc, char **argv)
         DataReader::ReadTORCSTrack(Config::inst().GetOption<string>("track"), model,
                                    track_start);
 
+        if (Config::inst().GetOption<string>("model_path") != "")
+            DataReader::ReadHingeModel(Config::inst().GetOption<string>("model_path"),
+                                       model);
+
         std::unique_ptr<TorcsIntegration> integration;
         ExecutorRacing executor(model);
 
@@ -83,6 +87,13 @@ int main(int argc, char **argv)
             if (!integration &&
                 score < Config::inst().GetOption<float>("score_threshold"))
             {
+                auto track_name = Config::inst().GetOption<string>("track");
+                std::replace(track_name.begin(), track_name.end(), '/', '_');
+
+                DataReader::SaveHingeModel(
+                    Config::inst().GetOption<string>("save_model_path_prefix") +
+                        track_name + ".hinges",
+                    model);
                 integration = std::make_unique<TorcsIntegration>();
                 car_state = integration->Begin();
             }

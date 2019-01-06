@@ -255,6 +255,8 @@ Vector<2, false> HingeModel::Hinge::GetPosition() const
 
 double HingeModel::Hinge::GetCrossposition() const { return crossposition_.value(); }
 
+double HingeModel::Hinge::GetSpeed() const { return speed_.value(); }
+
 double HingeModel::Hinge::GetForward() const { return forward_; }
 
 HingeModel::Hinge *HingeModel::Hinge::GetNext() const
@@ -266,6 +268,10 @@ Vector<2, false> HingeModel::Hinge::GetCrosspositionVector() const
 {
     return crossposition_vector_;
 }
+
+void HingeModel::Hinge::SetCrossposition(double cp) { crossposition_ = cp; }
+
+void HingeModel::Hinge::SetSpeed(double speed) { speed_ = speed; }
 
 SDL2pp::Color HingeModel::Hinge::SpeedToColor(double speed)
 {

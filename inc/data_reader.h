@@ -11,6 +11,9 @@ class DataReader
   public:
     static void ReadTORCSTrack(std::string xml_path, HingeModel &model,
                                Vector<2, false> startpoint);
+
+    static void SaveHingeModel(std::string target_path, const HingeModel &model);
+    static void ReadHingeModel(std::string target_path, HingeModel &model);
 };
 
 class TrackSaver

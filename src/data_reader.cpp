@@ -1,4 +1,5 @@
 
+#include <fstream>
 #include <math.h>
 #include <pugixml.hpp>
 
@@ -98,6 +99,59 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model,
     // last_hinge->LinkForward(first_hinge);
 
     log.Info() << "Track reading done. " << hinges_n << " hinges produced.";
+}
+
+void DataReader::SaveHingeModel(std::string target_path, const HingeModel &model)
+{
+    // FIXME: serialize to xml instead of binary
+    std::ofstream outfile(target_path, std::ios::out | std::ios::binary);
+    ASSERT(outfile.good());
+
+    auto current_hinge = model.GetFirstHinge();
+    auto first_hinge = current_hinge;
+    do
+    {
+        auto cp = current_hinge->GetCrossposition();
+        auto speed = current_hinge->GetSpeed();
+        outfile.write((const char *)&cp, sizeof(cp));
+        outfile.write((const char *)&speed, sizeof(cp));
+        current_hinge = current_hinge->GetNext();
+    } while (current_hinge && current_hinge != first_hinge);
+
+    outfile.close();
+    Log("DataReader").Info() << "Saved hinge model to " << target_path;
+}
+
+void DataReader::ReadHingeModel(std::string target_path, HingeModel &model)
+{
+    Log("DataReader").Info() << "Reading hinges from " << target_path;
+
+    std::fstream infile(target_path, std::ios::in | std::ios::binary);
+    ASSERT(infile.good());
+    double cp, speed;
+
+    auto current_hinge = model.GetFirstHinge();
+    auto first_hinge = current_hinge;
+
+    while (true)
+    {
+        infile.read((char *)&cp, sizeof(double));
+        infile.read((char *)&speed, sizeof(double));
+
+        if (infile.eof())
+            break;
+
+        ASSERT(current_hinge, "The file cotains too many hinges!");
+
+        current_hinge->SetCrossposition(cp);
+        current_hinge->SetSpeed(speed);
+        current_hinge = current_hinge->GetNext();
+    }
+
+    ASSERT(!current_hinge || current_hinge == first_hinge,
+           "The file doesn't cotain all the hinges!");
+
+    Log("DataReader").Info() << "Model reading done.";
 }
 
 TrackSaver::TrackSaver(std::string track_name)

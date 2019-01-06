@@ -13,7 +13,7 @@ ExecutorRecording::ExecutorRecording()
       track_saver_(Config::inst().GetOption<std::string>("track")),
       sensor_left_(Config::inst().GetOption<int>("sensor_left")),
       sensor_right_(Config::inst().GetOption<int>("sensor_right")),
-      sensor_front_(Config::inst().GetOption<int>("sensor_front")), last_f_(5000.0),
+      sensor_front_(Config::inst().GetOption<int>("sensor_front")), last_f_(-1.0),
       recording_enabled_(false)
 {
     log_.Info() << "Created recording executor.";
@@ -70,4 +70,7 @@ void ExecutorRecording::Visualise(std::vector<Visualisation::Object> &objects) c
     track_saver_.Visualise(objects);
 }
 
-bool ExecutorRecording::RecordingDone() { return !recording_enabled_ && last_f_ < 500.0; }
+bool ExecutorRecording::RecordingDone()
+{
+    return !recording_enabled_ && last_f_ < 100.0 && last_f_ > 0.0f;
+}

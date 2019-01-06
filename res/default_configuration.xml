@@ -25,7 +25,9 @@
     <alpha type="float">0.005</alpha>
     <score_threshold type="float">300</score_threshold>
 
-    <track type="string">data/tracks/testsave.xml</track>
+    <track type="string">data/tracks/forza.xml</track>
+    <model_path type="string"></model_path>
+    <save_model_path_prefix type="string">/tmp/</save_model_path_prefix>
 
     <board_width type="int">10</board_width>
     <board_height type="int">10</board_height>
