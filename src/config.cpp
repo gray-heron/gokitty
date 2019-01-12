@@ -17,18 +17,18 @@ Config::Config()
     pugi::xml_document doc;
     auto fs = cmrc::resources::get_filesystem();
     auto config_file = fs.open("res/default_configuration.xml");
-    if (!doc.load_buffer(config_file.begin(), config_file.size()))
-        throw Exception("Couldn't parse configuration");
+    ASSERT(doc.load_buffer(config_file.begin(), config_file.size()),
+           "Couldn't parse default configuration!");
     LoadXMLConfig(doc);
 }
 
 void Config::Load(std::string config_path)
 {
     pugi::xml_document doc;
-    if (!doc.load_file(config_path.c_str()))
-        throw Exception("Couldn't parse configuration");
-
-    LoadXMLConfig(doc);
+    if (doc.load_file(config_path.c_str()))
+        LoadXMLConfig(doc);
+    else
+        log_.Error() << "Couldn't parse configuration";
 }
 
 void Config::Load(int argc, char **argv)

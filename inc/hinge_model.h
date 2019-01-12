@@ -84,6 +84,7 @@ class HingeModel : public ModelElement
         Vector<2, false> GetCrosspositionVector() const;
         double GetForward() const;
         Hinge *GetNext() const;
+        Hinge *GetPrevious() const;
         void SetCrossposition(double new_cp);
         void SetSpeed(double new_cp);
     };

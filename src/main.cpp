@@ -56,8 +56,11 @@ int main(int argc, char **argv)
                                    track_start);
 
         if (Config::inst().GetOption<string>("model_path") != "")
+        {
             DataReader::ReadHingeModel(Config::inst().GetOption<string>("model_path"),
                                        model);
+            score = model.Optimize(main_stack);
+        }
 
         std::unique_ptr<TorcsIntegration> integration;
         ExecutorRacing executor(model);
@@ -65,7 +68,7 @@ int main(int argc, char **argv)
         if (vis)
             vis->SetCameraPos(track_start);
 
-        bool optimization_paused = false;
+        bool optimization_paused = true;
         bool exit_requested = false;
         CarState car_state;
 
@@ -92,8 +95,9 @@ int main(int argc, char **argv)
 
                 DataReader::SaveHingeModel(
                     Config::inst().GetOption<string>("save_model_path_prefix") +
-                        track_name + ".hinges",
+                        track_name + "_" + std::to_string(score) + ".hinges",
                     model);
+
                 integration = std::make_unique<TorcsIntegration>();
                 car_state = integration->Begin();
             }

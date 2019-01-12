@@ -16,14 +16,14 @@
     <angle_factor type="float">0.00403</angle_factor>
     <forward_factor type="float">1.0</forward_factor>
     <bound_factor type="float">1</bound_factor>
-    <band_separation type="float">15.0f</band_separation>
+    <band_separation type="float">7.0f</band_separation>
 
     <max_centrifugal_force type="float">20.0</max_centrifugal_force>
     <max_acceleration type="float">2.3</max_acceleration>
     <acceleration type="float">10.0</acceleration>
 
-    <alpha type="float">0.005</alpha>
-    <score_threshold type="float">300</score_threshold>
+    <alpha type="float">0.002</alpha>
+    <score_threshold type="float">0</score_threshold>
 
     <track type="string">data/tracks/forza.xml</track>
     <model_path type="string"></model_path>
@@ -56,15 +56,14 @@
     <sensor_right type="int">18</sensor_right>
     <sensor_front type="int">9</sensor_front>
 
-    <driver_speed_p type="float">0.1</driver_speed_p>
+    <driver_speed_p type="float">0.03</driver_speed_p>
     <driver_speed_i type="float">0.00003</driver_speed_i>
     <driver_speed_d type="float">0.0</driver_speed_d>
 
-    <driver_cross_p type="float">2.05</driver_cross_p>
-    <driver_cross_i type="float">0.004</driver_cross_i>
-    <driver_cross_d type="float">40.0</driver_cross_d>
+    <driver_cross_p type="float">0.50</driver_cross_p>
+    <driver_cross_i type="float">0.00002</driver_cross_i>
+    <driver_cross_d type="float">5.0</driver_cross_d>
 
-    <recording_speed type="float">120</recording_speed>
     <recording_speed type="float">120</recording_speed>
     <racing_speed type="float">60</racing_speed>
     <forward_boost type="float">20</forward_boost>

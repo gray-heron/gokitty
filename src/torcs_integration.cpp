@@ -214,13 +214,21 @@ std::string TorcsIntegration::Receive()
     boost::system::error_code ec;
 
     boost::array<char, UINT16_MAX> recv_buf;
-    size_t len =
-        socket_.receive_from(boost::asio::buffer(recv_buf), server_endpoint_, 0, ec);
+    size_t last_good_len = 0;
 
-    if (ec == boost::asio::error::would_block)
-        return "";
+    do
+    {
+        size_t len =
+            socket_.receive_from(boost::asio::buffer(recv_buf), server_endpoint_, 0, ec);
+
+        if (len != 0)
+            last_good_len = len;
+    } while (ec != boost::asio::error::would_block);
+
+    if (last_good_len != 0)
+        return std::string(recv_buf.data(), last_good_len - 1);
     else
-        return std::string(recv_buf.data(), len - 1);
+        return "";
 }
 
 TorcsIntegration::~TorcsIntegration() {}

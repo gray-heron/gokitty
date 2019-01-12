@@ -52,11 +52,11 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model,
         {
             ASSERT((std::string)child.name() == "waypoint");
 
-            float lx = x + std::cos(heading + M_PI / 2.0f) * left * bound_factor;
-            float ly = y + std::sin(heading + M_PI / 2.0f) * left * bound_factor;
+            float lx = x + std::cos(heading + M_PI / 2.0f) * left;
+            float ly = y + std::sin(heading + M_PI / 2.0f) * left;
 
-            float rx = x + std::cos(heading - M_PI / 2.0f) * right * bound_factor;
-            float ry = y + std::sin(heading - M_PI / 2.0f) * right * bound_factor;
+            float rx = x + std::cos(heading - M_PI / 2.0f) * right;
+            float ry = y + std::sin(heading - M_PI / 2.0f) * right;
 
             auto left_band =
                 new HingeModel::BandSegement(&model, Vector<2, false>({{lx, ly}}));

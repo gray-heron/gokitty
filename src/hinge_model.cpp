@@ -264,6 +264,11 @@ HingeModel::Hinge *HingeModel::Hinge::GetNext() const
     return static_cast<Hinge *>(next_);
 }
 
+HingeModel::Hinge *HingeModel::Hinge::GetPrevious() const
+{
+    return static_cast<Hinge *>(previous_);
+}
+
 Vector<2, false> HingeModel::Hinge::GetCrosspositionVector() const
 {
     return crossposition_vector_;

@@ -1,8 +1,11 @@
 <configuration>
-    <racing_speed type="float">290</racing_speed>
-    <score_threshold type="float">600</score_threshold>
+    <track>data/tracks/street.xml</track>
+    <gui>1</gui>
+    <forward_boost>27</forward_boost>
+    <optimizations_per_frame>10</optimizations_per_frame>
+    <score_threshold>400</score_threshold>
+    <racing_speed>130</racing_speed>
 
-    <driver_cross_p type="float">1.05</driver_cross_p>
-    <driver_cross_i type="float">0.002</driver_cross_i>
-    <driver_cross_d type="float">20.0</driver_cross_d>
+    <bound_factor type="float">0.8</bound_factor>
+    <model_path>/tmp/data_tracks_street.xml_394.996289.hinges</model_path>
 </configuration>
