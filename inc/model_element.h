@@ -16,12 +16,12 @@ class ModelElement
     virtual void VisualiseThis(std::vector<Visualisation::Object> &objects) const = 0;
 
   protected:
-    void SetupEquations();
     void AddChild(ModelElement *child);
-    void ComputeScore(adept::aReal &score);
     void ApplyGradient(double score_normalization);
 
   public:
     virtual ~ModelElement() = default;
     void Visualise(std::vector<Visualisation::Object> &objects);
+    void SetupEquations();
+    void ComputeScore(adept::aReal &score);
 };

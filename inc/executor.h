@@ -38,6 +38,7 @@ class ExecutorRacing : public Executor
     const HingeModel &model_;
     TorcsGearbox gearbox_controller_;
     PidController speed_controller_;
+    PidController angle_controller_;
     PidController crossposition_controller_;
 
     HingeModel::Hinge *current_hinge_;

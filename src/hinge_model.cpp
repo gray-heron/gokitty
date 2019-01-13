@@ -172,8 +172,8 @@ void HingeModel::Hinge::ComputeScoreThis(adept::aReal &score) const
 
     adept::aReal centrifugal_force = (speed_ * speed_) / r;
 
-    score += -1.0 / (centrifugal_force - model_->max_centrifugal_force_);
-    score += -1.0 / (adept::abs(speed_ - static_cast<Hinge *>(next_)->speed_) /
+    score += -0.2 / (centrifugal_force - model_->max_centrifugal_force_);
+    score += -0.2 / (adept::abs(speed_ - static_cast<Hinge *>(next_)->speed_) /
                          adept::norm2(position_diff_n) -
                      model_->max_acceleration_);
 
@@ -184,7 +184,7 @@ void HingeModel::Hinge::ComputeScoreThis(adept::aReal &score) const
 
 void HingeModel::Hinge::ApplyGradientThis(double score_normalization)
 {
-    speed_ -= speed_.get_gradient() * model_->alpha_ * score_normalization * 10.0;
+    speed_ -= speed_.get_gradient() * model_->alpha_ * score_normalization * 200.0;
 
     if (next_ && previous_)
     {
@@ -280,12 +280,12 @@ void HingeModel::Hinge::SetSpeed(double speed) { speed_ = speed; }
 
 SDL2pp::Color HingeModel::Hinge::SpeedToColor(double speed)
 {
-    if (speed > 50.0)
+    if (speed > 255.0)
         return SDL2pp::Color(0, 255, 0);
-    else if (speed < 0.0)
-        return SDL2pp::Color(0, 63, 0);
+    else if (speed < 60.0)
+        return SDL2pp::Color(0, 60, 0);
     else
-        return SDL2pp::Color(0, speed / 50.0 * 255.0, 0);
+        return SDL2pp::Color(0, speed, 0);
 }
 
 // ================ BAND_SEGMENT ================

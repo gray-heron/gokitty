@@ -41,8 +41,8 @@ void DataReader::ReadTORCSTrack(std::string xml_path, HingeModel &model,
     {
         float forward = child.child("forward").text().as_float();
         float angle = child.child("angle").text().as_float();
-        float left = child.child("left").text().as_float();
-        float right = child.child("right").text().as_float();
+        float left = child.child("left").text().as_float() * bound_factor;
+        float right = child.child("right").text().as_float() * bound_factor;
 
         x += std::cos(heading) * forward_factor * forward;
         y += std::sin(heading) * forward_factor * forward;
@@ -113,6 +113,7 @@ void DataReader::SaveHingeModel(std::string target_path, const HingeModel &model
     {
         auto cp = current_hinge->GetCrossposition();
         auto speed = current_hinge->GetSpeed();
+
         outfile.write((const char *)&cp, sizeof(cp));
         outfile.write((const char *)&speed, sizeof(cp));
         current_hinge = current_hinge->GetNext();
@@ -127,7 +128,7 @@ void DataReader::ReadHingeModel(std::string target_path, HingeModel &model)
     Log("DataReader").Info() << "Reading hinges from " << target_path;
 
     std::fstream infile(target_path, std::ios::in | std::ios::binary);
-    ASSERT(infile.good());
+    ASSERT(infile.good(), "Failed to load hinge model!");
     double cp, speed;
 
     auto current_hinge = model.GetFirstHinge();

@@ -59,7 +59,11 @@ int main(int argc, char **argv)
         {
             DataReader::ReadHingeModel(Config::inst().GetOption<string>("model_path"),
                                        model);
-            score = model.Optimize(main_stack);
+            adept::aReal ascore = 0.0;
+            model.SetupEquations();
+            model.ComputeScore(ascore);
+            score = ascore.value();
+            log.Info() << "Loaded hinge model. Its score is " << score << ".";
         }
 
         std::unique_ptr<TorcsIntegration> integration;
@@ -88,7 +92,7 @@ int main(int argc, char **argv)
             }
 
             if (!integration &&
-                score < Config::inst().GetOption<float>("score_threshold"))
+                score <= Config::inst().GetOption<float>("score_threshold"))
             {
                 auto track_name = Config::inst().GetOption<string>("track");
                 std::replace(track_name.begin(), track_name.end(), '/', '_');
